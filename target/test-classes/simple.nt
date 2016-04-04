@@ -1,0 +1,32 @@
+<info:fedora/demo:999/RELS-EXT> <info:fedora/fedora-system:def/view#disseminationType> <info:fedora/*/RELS-EXT> .
+<info:fedora/demo:999/RELS-EXT> <info:fedora/fedora-system:def/view#isVolatile> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<info:fedora/demo:999/RELS-EXT> <info:fedora/fedora-system:def/view#lastModifiedDate> "Thu Dec 09 19:21:58 EST 2004"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<info:fedora/demo:999/RELS-EXT> <info:fedora/fedora-system:def/model#state> <info:fedora/fedora-system:def/model#Active> .
+<info:fedora/demo:999/RELS-EXT> <info:fedora/fedora-system:def/view#mimeType> "application/rdf+xml" .
+<info:fedora/demo:999/CRAZYDS> <info:fedora/fedora-system:def/view#disseminationType> <info:fedora/*/CRAZYDS> .
+<info:fedora/demo:999/CRAZYDS> <info:fedora/fedora-system:def/view#isVolatile> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<info:fedora/demo:999/CRAZYDS> <info:fedora/fedora-system:def/view#lastModifiedDate> "Thu Dec 09 19:21:58 EST 2004"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<info:fedora/demo:999/CRAZYDS> <info:fedora/fedora-system:def/model#state> <info:fedora/fedora-system:def/model#Active> .
+<info:fedora/demo:999/CRAZYDS> <info:fedora/fedora-system:def/view#mimeType> "application/junk" .
+<info:fedora/demo:999/DC> <info:fedora/fedora-system:def/view#disseminationType> <info:fedora/*/DC> .
+<info:fedora/demo:999/DC> <info:fedora/fedora-system:def/view#isVolatile> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<info:fedora/demo:999/DC> <info:fedora/fedora-system:def/view#lastModifiedDate> "Thu Dec 09 19:21:58 EST 2004"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<info:fedora/demo:999/DC> <info:fedora/fedora-system:def/model#state> <info:fedora/fedora-system:def/model#Active> .
+<info:fedora/demo:999/DC> <info:fedora/fedora-system:def/view#mimeType> "text/xml" .
+<info:fedora/demo:999> <info:fedora/fedora-system:def/model#state> <info:fedora/fedora-system:def/model#Active> .
+<info:fedora/demo:999> <http://purl.org/dc/elements/1.1/publisher> "Cornell CIS" .
+<info:fedora/demo:999> <http://purl.org/dc/elements/1.1/description> "FOXML" .
+<info:fedora/demo:999> <http://www.nsdl.org/ontologies/relationships#isPartOf> <info:fedora/mystuff:100> .
+<info:fedora/demo:999> <info:fedora/fedora-system:def/model#ownerId> "fedoraAdmin" .
+<info:fedora/demo:999> <info:fedora/fedora-system:def/view#lastModifiedDate> "Thu Jan 20 17:46:07 EST 2005"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<info:fedora/demo:999> <http://purl.org/dc/elements/1.1/identifier> "demo:999" .
+<info:fedora/demo:999> <info:fedora/fedora-system:def/view#disseminates> <info:fedora/demo:999/CRAZYDS> .
+<info:fedora/demo:999> <info:fedora/fedora-system:def/model#createdDate> "Thu Dec 09 19:21:58 EST 2004"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<info:fedora/demo:999> <info:fedora/fedora-system:def/relations-external#isMemberOfCollection> <info:fedora/test:collection2> .
+<info:fedora/demo:999> <info:fedora/fedora-system:def/view#disseminates> <info:fedora/demo:999/RELS-EXT> .
+<info:fedora/demo:999> <info:fedora/fedora-system:def/view#disseminates> <info:fedora/demo:999/DC> .
+<info:fedora/demo:999> <http://purl.org/dc/elements/1.1/creator> "Sandy Payette" .
+<info:fedora/demo:999> <info:fedora/fedora-system:def/model#label> "FOXML Reference Example" .
+<info:fedora/demo:999> <http://purl.org/dc/elements/1.1/subject> "Fedora documentation" .
+<info:fedora/demo:999> <info:fedora/fedora-system:def/relations-external#isMemberOfCollection> <info:fedora/test:collection1> .
+<info:fedora/demo:999> <http://purl.org/dc/elements/1.1/title> "FOXML Reference Object" .

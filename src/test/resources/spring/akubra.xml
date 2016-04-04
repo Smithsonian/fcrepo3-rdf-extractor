@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <context:property-placeholder/>
+
+    <bean name="objectStore" class="org.akubraproject.map.IdMappingBlobStore">
+        <constructor-arg value="urn:example.org:objectStore"/>
+        <constructor-arg ref="fsObjectStore"/>
+        <constructor-arg ref="fsObjectStoreMapper"/>
+    </bean>
+
+    <bean name="fsObjectStore" class="org.akubraproject.fs.FSBlobStore">
+        <constructor-arg value="urn:example.org:fsObjectStore"/>
+        <constructor-arg value="${target}/test-classes/objectStore"/>
+    </bean>
+
+    <bean name="fsObjectStoreMapper"
+        class="org.fcrepo.server.storage.lowlevel.akubra.HashPathIdMapper">
+        <constructor-arg value="##"/>
+    </bean>
+
+    <bean name="datastreamStore" class="org.akubraproject.map.IdMappingBlobStore">
+        <constructor-arg value="urn:fedora:datastreamStore"/>
+        <constructor-arg ref="fsDatastreamStore"/>
+        <constructor-arg ref="fsDatastreamStoreMapper"/>
+    </bean>
+
+    <bean name="fsDatastreamStore" class="org.akubraproject.fs.FSBlobStore">
+        <constructor-arg value="urn:example.org:fsDatastreamStore"/>
+        <constructor-arg value="${target}/test-classes/datastreamStore"/>
+    </bean>
+
+    <bean name="fsDatastreamStoreMapper"
+        class="org.fcrepo.server.storage.lowlevel.akubra.HashPathIdMapper">
+        <constructor-arg value="##"/>
+    </bean>
+
+</beans>

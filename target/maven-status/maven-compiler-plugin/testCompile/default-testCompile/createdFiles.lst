@@ -1,0 +1,6 @@
+edu/si/fcrepo/ObjectProcessorTest$1.class
+edu/si/fcrepo/integration/NormalOperationIT.class
+edu/si/fcrepo/GraphStreamRDFTest.class
+edu/si/fcrepo/QueueingTripleStreamRDFTest.class
+edu/si/fcrepo/ObjectProcessorTest.class
+edu/si/fcrepo/DublinCoreContentHandlerTest.class

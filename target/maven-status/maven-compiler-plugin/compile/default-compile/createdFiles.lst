@@ -1,0 +1,10 @@
+edu/si/fcrepo/QueueingTripleStreamRDF.class
+edu/si/fcrepo/ObjectProcessor$1.class
+edu/si/fcrepo/ObjectProcessor.class
+edu/si/fcrepo/RdfVocabulary$1.class
+edu/si/fcrepo/ObjectProcessor$StatelessContentHandler.class
+org/fcrepo/server/storage/lowlevel/akubra/HashPathIdMapper.class
+edu/si/fcrepo/DublinCoreContentHandler.class
+edu/si/fcrepo/GraphStreamRDF.class
+edu/si/fcrepo/Loader.class
+edu/si/fcrepo/RdfVocabulary.class
