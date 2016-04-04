@@ -28,6 +28,8 @@ public class DublinCoreContentHandler extends DefaultHandler {
 
     private final StreamRDF sink;
 
+    private StringBuilder chars = new StringBuilder();
+
     /**
      * Both the current predicate (if available) and the flag for "Dublin-Core-ness". {@code null} indicates a
      * non-Dublin-Core (and therefore ignorable) predicate.
@@ -56,16 +58,18 @@ public class DublinCoreContentHandler extends DefaultHandler {
 
     @Override
     public void characters(final char[] ch, final int start, final int length) {
-        if (predicate != null) {
-            final Node object = createLiteral(new String(ch).substring(start, start + length));
-            final Triple t = create(subject, predicate, object);
-            sink.triple(t);
-            log.debug("Extracted triple: {}", t);
-        }
+        if (predicate != null) chars.append(ch, start, length);
     }
 
     @Override
     public void endElement(final String uri, final String localName, final String qName) {
-        predicate = null;
+        if (predicate != null) {
+            final Node object = createLiteral(chars.toString());
+            final Triple t = create(subject, predicate, object);
+            sink.triple(t);
+            chars.setLength(0);
+            log.debug("Extracted triple: {}", t);
+            predicate = null;
+        }
     }
 }

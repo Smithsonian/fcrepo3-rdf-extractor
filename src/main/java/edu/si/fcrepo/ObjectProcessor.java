@@ -1,6 +1,7 @@
 
 package edu.si.fcrepo;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static edu.si.fcrepo.RdfVocabulary.CREATEDDATE;
 import static edu.si.fcrepo.RdfVocabulary.DISSEMINATES;
 import static edu.si.fcrepo.RdfVocabulary.DISSEMINATION_TYPE;
@@ -19,7 +20,6 @@ import static org.apache.jena.graph.NodeFactory.createLiteralByValue;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.graph.Triple.create;
 import static org.apache.jena.riot.Lang.RDFXML;
-import static org.apache.jena.riot.RDFDataMgr.parse;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J.sendSystemOutAndErrToSLF4J;
 
@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Date;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -39,11 +41,11 @@ import org.akubraproject.BlobStoreConnection;
 import org.akubraproject.MissingBlobException;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RiotException;
 import org.apache.jena.riot.system.StreamRDF;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
-
 import com.github.cwilper.fcrepo.dto.core.ControlGroup;
 import com.github.cwilper.fcrepo.dto.core.Datastream;
 import com.github.cwilper.fcrepo.dto.core.DatastreamVersion;
@@ -63,7 +65,13 @@ public class ObjectProcessor implements Consumer<URI> {
 
     static {
         sendSystemOutAndErrToSLF4J();
-        saxFactory.setNamespaceAware(true);
+        try {
+            saxFactory.setFeature("http://xml.org/sax/features/xmlns-uris", true);
+            saxFactory.setNamespaceAware(true);
+            saxFactory.setValidating(false);
+            saxFactory.setXIncludeAware(false);
+            saxFactory.setSchema(null);
+        } catch (SAXException | ParserConfigurationException e) {}
     }
 
     private static final Logger log = getLogger(ObjectProcessor.class);
@@ -103,45 +111,38 @@ public class ObjectProcessor implements Consumer<URI> {
                 final Datastream relsIntDatastream = object.datastreams().get("RELS-INT");
                 final Datastream relsExtDatastream = object.datastreams().get("RELS-EXT");
 
-                if (relsIntDatastream != null) try (InputStream rdf = getDatastreamContent(relsIntDatastream)) {
-                    parse(tripleSink, rdf, RDFXML);
-                } catch (final MissingBlobException e) {
-                    log.error("Error extracting triples from object: {}", objectId);
-                    log.error("Couldn't find RELS-INT datastream!", e);
-                } catch (final RiotException e) {
-                    log.error("Error extracting triples from object: {}", objectId);
-                    log.error("Couldn't parse RELS-INT datastream!", e);
-                }
-                try (InputStream rdf = getDatastreamContent(relsExtDatastream)) {
-                    parse(tripleSink, rdf, RDFXML);
-                } catch (final MissingBlobException e) {
-                    log.error("Error extracting triples from object: {}", objectId);
-                    log.error("Couldn't find RELS-EXT datastream!", e);
-                } catch (final RiotException e) {
-                    log.error("Error extracting triples from object: {}", objectId);
-                    log.error("Couldn't parse RELS-EXT datastream!", e);
-                }
-
-                try (final InputStream dcXML = getDatastreamContent(dcDatastream)) {
-                    final Node subject = createURI("info:fedora/" + object.pid());
-                    try {
-                        final SAXParser parser = saxFactory.newSAXParser();
-                        parser.parse(dcXML, new DublinCoreContentHandler(tripleSink, subject));
-                    } catch (ParserConfigurationException | SAXException | IOException e) {
-                        log.error("Error processing " + subject + "!\n", e);
-                    }
-                } catch (final MissingBlobException e) {
-                    log.error("Error extracting triples from object: {}", objectId);
-                    log.error("Couldn't find DC datastream!", e);
-                } catch (final RiotException e) {
-                    log.error("Error extracting triples from object: {}", objectId);
-                    log.error("Couldn't parse DC datastream!", e);
-                }
+                if (relsIntDatastream != null)
+                    parse(objectId, relsIntDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
+                parse(objectId, relsExtDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
+                parse(objectId, dcDatastream, dcXML -> {
+                    final SAXParser parser = saxFactory.newSAXParser();
+                    parser.parse(dcXML, new DublinCoreContentHandler(tripleSink, createURI(objectId.toString())));
+                });
             }
         } catch (final IOException e) {
             log.error("Error reading from object: " + objectId, e);
         }
     }
+
+    @FunctionalInterface
+    private static interface UnsafeConsumer<E> {
+
+        void accept(E e) throws Exception;
+    }
+
+    private void parse(final URI objectId, final Datastream ds, final UnsafeConsumer<InputStream> parse) {
+        try (InputStream rdf = getDatastreamContent(ds)) {
+            parse.accept(rdf);
+        } catch (final Exception e) {
+            final String verb = errorMessageVerbs.getOrDefault((e.getClass()), "extract triples from");
+            log.error("Couldn't {} datastream {} from object {}!", verb, ds.id(), objectId);
+            log.error("Caused by: ", e);
+        }
+    }
+
+    private static final Map<Class<? extends Exception>, String> errorMessageVerbs = new IdentityHashMap<>(
+                    of(MissingBlobException.class, "find", RiotException.class, "parse", IOException.class, "retrieve",
+                                    ParserConfigurationException.class, "XML-parse", SAXException.class, "XML-parse"));
 
     private void sink(final Triple t) {
         tripleSink.triple(t);

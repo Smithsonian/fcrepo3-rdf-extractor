@@ -32,6 +32,8 @@ public class DublinCoreContentHandlerTest {
 
     private static final Node DC_TITLE = createURI(DC_NAMESPACE + "title");
 
+    private static final Node DC_DESCRIPTION = createURI(DC_NAMESPACE + "description");
+
     private static final SAXParserFactory saxFactory = newInstance();
 
     static {
@@ -45,7 +47,7 @@ public class DublinCoreContentHandlerTest {
                     "   xmlns:dc='http://purl.org/dc/elements/1.1/'>" +
                     "     <dc:title>FOXML Reference Object</dc:title>" + "     <oai_dc:foo>BAD TRIPLE!</oai_dc:foo>" +
                     "      <dc:creator>Sandy Payette</dc:creator>" + "     <dc:subject>Documentation</dc:subject>" +
-                    "     <dc:description>FOXML showing how a digital object is encoded.</dc:description>" +
+                    "     <dc:description>FOXML showing how a \n" + "digital object is encoded.</dc:description>" +
                     " <dc:publisher>Cornell CIS</dc:publisher>" + " <dc:identifier>demo:999</dc:identifier>" +
                     "</oai_dc:dc> ";
 
@@ -63,6 +65,11 @@ public class DublinCoreContentHandlerTest {
         assertTrue("Missing title triple!", triples.contains(titleTriple));
         final Triple subjectTriple = create(mockSubject, DC_SUBJECT, createLiteral("Documentation"));
         assertTrue("Missing subject triple!", triples.contains(subjectTriple));
+        // notice the newline inside this literal
+        final Triple descriptionTriple = create(mockSubject, DC_DESCRIPTION,
+                        createLiteral("FOXML showing how a \n" + "digital object is encoded."));
+        assertTrue("Missing description triple!", triples.contains(descriptionTriple));
+
         final Triple nonDublinCoreTriple = create(mockSubject, createURI("oai_dc:foo"), createLiteral("BAD TRIPLE!"));
         assertFalse("Found non-Dublin-Core triple!", triples.contains(nonDublinCoreTriple));
         assertTrue("Should be no quads!", tuples.getQuads().isEmpty());

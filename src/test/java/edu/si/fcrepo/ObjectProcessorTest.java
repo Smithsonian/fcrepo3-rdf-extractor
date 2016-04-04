@@ -14,12 +14,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.List;
 
 import org.akubraproject.Blob;
 import org.akubraproject.BlobStore;
 import org.akubraproject.BlobStoreConnection;
 import org.akubraproject.mem.MemBlobStore;
+import org.apache.commons.io.IOUtils;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
@@ -46,10 +48,12 @@ public class ObjectProcessorTest {
         };
         final BlobStoreConnection conn = objectStore.openConnection(null, null);
         // load some simple FOXML into our store
-        final Blob blob = conn.getBlob(loadResource("simple-foxml.xml"), -1, null);
+        final URI blobId = URI.create("info:fedora/demo:999");
+        final Blob blob = conn.getBlob(blobId, null);
+        IOUtils.copy(loadResource("simple-foxml.xml"), blob.openOutputStream(0, true));
         final ObjectProcessor testProcessor = new ObjectProcessor(conn, null, tuples);
         // process the FOXML from that store
-        testProcessor.accept(blob.getId());
+        testProcessor.accept(URI.create("info:fedora/demo:999"));
         // examine the resulting tuples
         final List<Triple> triples = tuples.getTriples();
         final Node objectUri = createURI("info:fedora/demo:999");
