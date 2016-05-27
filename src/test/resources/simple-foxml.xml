@@ -15,7 +15,7 @@
     <foxml:datastream ID="DC" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
         <foxml:datastreamVersion FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC.0"
             MIMETYPE="text/xml" LABEL="Dublin Core Record for this object" SIZE="488"
-            CREATED="2004-12-10T00:21:58.000Z">
+            CREATED="2004-12-10T00:21:58.001Z">
             <foxml:xmlContent>
                 <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
                     xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -54,7 +54,7 @@
     </foxml:datastream>
     <foxml:datastream ID="CRAZYDS" CONTROL_GROUP="M" STATE="A">
         <foxml:datastreamVersion FORMAT_URI="garbage" ID="RELS-INT.0" MIMETYPE="application/junk"
-            LABEL="Nothing" CREATED="2004-12-10T00:21:58.000Z">
+            LABEL="Nothing" CREATED="2004-12-10T00:21:58.001Z">
             <foxml:contentLocation TYPE="INTERNAL_ID" REF="Nowheresville"/>
         </foxml:datastreamVersion>
     </foxml:datastream>

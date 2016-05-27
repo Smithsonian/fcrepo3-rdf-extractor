@@ -1,7 +1,6 @@
 
 package edu.si.fcrepo;
 
-import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDboolean;
 import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
 
@@ -17,9 +16,11 @@ import com.github.cwilper.fcrepo.dto.core.State;
  */
 public final class RdfVocabulary {
 
-    public static final String MODEL_NS = "info:fedora/fedora-system:def/model#";
+    public static final String SYSTEM_NS = "info:fedora/fedora-system:";
 
-    public static final String VIEW_NS = "info:fedora/fedora-system:def/view#";
+    public static final String MODEL_NS = SYSTEM_NS + "def/model#";
+
+    public static final String VIEW_NS = SYSTEM_NS + "def/view#";
 
     public static final Node CREATEDDATE = createURI(MODEL_NS + "createdDate");
 
@@ -45,9 +46,13 @@ public final class RdfVocabulary {
 
     public static final Node DISSEMINATION_TYPE = createURI(VIEW_NS + "disseminationType");
 
-    public static final Node FALSE = createLiteral("false", XSDboolean);
+    public static final Node FALSE = createLiteral("false");
 
-    public static final Node TRUE = createLiteral("true", XSDboolean);
+    public static final Node TRUE = createLiteral("true");
+
+    public static final Node HAS_MODEL = createURI(MODEL_NS + "hasModel");
+
+    public static final Node FEDORA_OBJECT = createURI(SYSTEM_NS + "FedoraObject-3.0");
 
     public static Node state(final State state) {
         switch (state) {

@@ -3,7 +3,7 @@ package edu.si.fcrepo;
 
 import static edu.si.fcrepo.DublinCoreContentHandler.DC_NAMESPACE;
 import static edu.si.fcrepo.RdfVocabulary.DISSEMINATES;
-import static java.lang.Thread.currentThread;
+import static edu.si.fcrepo.TestHelpers.loadResource;
 import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.graph.Triple.create;
@@ -13,7 +13,6 @@ import static org.apache.jena.riot.RDFDataMgr.read;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
@@ -28,6 +27,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.lang.CollectorStreamRDF;
+import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
 import org.junit.Test;
 
 public class ObjectProcessorTest {
@@ -40,12 +40,7 @@ public class ObjectProcessorTest {
 
     @Test
     public void simpleObject() throws IOException {
-        final CollectorStreamRDF tuples = new CollectorStreamRDF() {
-
-            @Override
-            public void start() {}
-
-        };
+        final CollectingBulkStreamRDF tuples = new CollectingBulkStreamRDF();
         final BlobStoreConnection conn = objectStore.openConnection(null, null);
         // load some simple FOXML into our store
         final URI blobId = URI.create("info:fedora/demo:999");
@@ -69,11 +64,20 @@ public class ObjectProcessorTest {
         triples.forEach(t -> results.add(results.asStatement(t)));
         RDFDataMgr.write(System.out, results, Lang.NTRIPLES);
         final Model rubric = createDefaultModel();
-        read(rubric, loadResource("simple.nt"), NTRIPLES);
+        read(rubric, TestHelpers.loadResource("simple.nt"), NTRIPLES);
         assertTrue("Did not find expected triples!", results.isIsomorphicWith(rubric));
     }
 
-    private static InputStream loadResource(final String name) {
-        return currentThread().getContextClassLoader().getResourceAsStream(name);
+    private static class CollectingBulkStreamRDF extends CollectorStreamRDF implements BulkStreamRDF {
+
+        @Override
+        public void start() {}
+
+        @Override
+        public void startBulk() { }
+
+        @Override
+        public void finishBulk() { }
+
     }
 }

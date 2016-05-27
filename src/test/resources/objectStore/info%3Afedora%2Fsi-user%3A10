@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" PID="si-user:10"
+xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+<foxml:objectProperties>
+<foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Deleted"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="bstern Projects"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2011-11-21T19:35:03.404Z"/>
+<foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2012-08-29T14:21:27.098Z"/>
+</foxml:objectProperties>
+<foxml:datastream ID="AUDIT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="AUDIT.0" LABEL="Audit Trail for this object" CREATED="2011-11-21T19:35:03.404Z" MIMETYPE="text/xml" FORMAT_URI="info:fedora/fedora-system:format/xml.fedora.audit">
+<foxml:xmlContent>
+<audit:auditTrail xmlns:audit="info:fedora/fedora-system:def/audit#">
+<audit:record ID="AUDREC1">
+<audit:process type="Fedora API-M"/>
+<audit:action>ingest</audit:action>
+<audit:componentID></audit:componentID>
+<audit:responsibility>mleggott</audit:responsibility>
+<audit:date>2011-11-21T19:35:03.404Z</audit:date>
+<audit:justification>Fedora Object Ingested</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC2">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>RELS-EXT</audit:componentID>
+<audit:responsibility>mleggott</audit:responsibility>
+<audit:date>2011-11-21T19:35:03.446Z</audit:date>
+<audit:justification>Ingested object RELS-EXT</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC3">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>RELS-EXT</audit:componentID>
+<audit:responsibility>mleggott</audit:responsibility>
+<audit:date>2011-11-21T19:35:03.487Z</audit:date>
+<audit:justification>Modified by Islandora API</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC4">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>RELS-EXT</audit:componentID>
+<audit:responsibility>mleggott</audit:responsibility>
+<audit:date>2011-11-21T19:35:03.651Z</audit:date>
+<audit:justification>Modified by Islandora API</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC5">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>COLLECTION_POLICY</audit:componentID>
+<audit:responsibility>mleggott</audit:responsibility>
+<audit:date>2011-11-21T19:35:03.685Z</audit:date>
+<audit:justification>Sidora added Collection Policy Stream</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC6">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>EAC-CPF</audit:componentID>
+<audit:responsibility>mleggott</audit:responsibility>
+<audit:date>2011-11-21T19:35:03.722Z</audit:date>
+<audit:justification>Added EAC-CPF</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC7">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByReference</audit:action>
+<audit:componentID>COLLECTION_POLICY</audit:componentID>
+<audit:responsibility>admin</audit:responsibility>
+<audit:date>2012-01-10T20:23:02.212Z</audit:date>
+<audit:justification>Modified by drush update collection policy</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC8">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByReference</audit:action>
+<audit:componentID>COLLECTION_POLICY</audit:componentID>
+<audit:responsibility>admin</audit:responsibility>
+<audit:date>2012-01-31T20:22:38.652Z</audit:date>
+<audit:justification>Modified by drush update collection policy</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC9">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByReference</audit:action>
+<audit:componentID>COLLECTION_POLICY</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2012-02-09T15:25:26.159Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC10">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByReference</audit:action>
+<audit:componentID>COLLECTION_POLICY</audit:componentID>
+<audit:responsibility>admin</audit:responsibility>
+<audit:date>2012-02-15T16:28:19.018Z</audit:date>
+<audit:justification>Modified by drush update collection policy</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC11">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyObject</audit:action>
+<audit:componentID></audit:componentID>
+<audit:responsibility>bstern</audit:responsibility>
+<audit:date>2012-07-17T19:40:00.198Z</audit:date>
+<audit:justification>Modified by Islandora API</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC12">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>COLLECTION_POLICY</audit:componentID>
+<audit:responsibility>admin</audit:responsibility>
+<audit:date>2012-08-16T18:32:59.344Z</audit:date>
+<audit:justification>Modified by Islandora API</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC13">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>COLLECTION_POLICY</audit:componentID>
+<audit:responsibility>admin</audit:responsibility>
+<audit:date>2012-08-21T12:14:25.457Z</audit:date>
+<audit:justification>Modified by Islandora API</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC14">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>COLLECTION_POLICY</audit:componentID>
+<audit:responsibility>admin</audit:responsibility>
+<audit:date>2012-08-21T12:31:52.242Z</audit:date>
+<audit:justification>Modified by Islandora API</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC15">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>COLLECTION_POLICY</audit:componentID>
+<audit:responsibility>admin</audit:responsibility>
+<audit:date>2012-08-21T12:49:46.281Z</audit:date>
+<audit:justification>Modified by Islandora API</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC16">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>COLLECTION_POLICY</audit:componentID>
+<audit:responsibility>admin</audit:responsibility>
+<audit:date>2012-08-21T13:11:00.649Z</audit:date>
+<audit:justification>Modified by Islandora API</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC17">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>COLLECTION_POLICY</audit:componentID>
+<audit:responsibility>admin</audit:responsibility>
+<audit:date>2012-08-29T14:21:27.098Z</audit:date>
+<audit:justification>Modified by Islandora API</audit:justification>
+</audit:record>
+</audit:auditTrail>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="DC" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+<foxml:datastreamVersion ID="DC1.0" LABEL="Dublin Core Record for this object" CREATED="2011-11-21T19:35:03.404Z" MIMETYPE="text/xml" FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" SIZE="378">
+<foxml:xmlContent>
+<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+  <dc:title>bstern Projects</dc:title>
+  <dc:identifier>si-user:10</dc:identifier>
+</oai_dc:dc>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="RELS-EXT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+<foxml:datastreamVersion ID="RELS-EXT.0" LABEL="Fedora object-to-object relationship metadata" CREATED="2011-11-21T19:35:03.446Z" MIMETYPE="text/xml" SIZE="151">
+<foxml:xmlContent>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about="info:fedora/si-user:10"></rdf:Description>
+</rdf:RDF>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="RELS-EXT.1" LABEL="Fedora Object-to-Object Relationship Metadata" CREATED="2011-11-21T19:35:03.487Z" MIMETYPE="text/xml" SIZE="306">
+<foxml:xmlContent>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about="info:fedora/si-user:10">
+    <isMemberOfCollection xmlns="info:fedora/fedora-system:def/relations-external#" rdf:resource="info:fedora/si:user-projects"></isMemberOfCollection>
+  </rdf:Description>
+</rdf:RDF>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="RELS-EXT.2" LABEL="Fedora Object-to-Object Relationship Metadata" CREATED="2011-11-21T19:35:03.651Z" MIMETYPE="text/xml" SIZE="420">
+<foxml:xmlContent>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about="info:fedora/si-user:10">
+    <isMemberOfCollection xmlns="info:fedora/fedora-system:def/relations-external#" rdf:resource="info:fedora/si:user-projects"></isMemberOfCollection>
+    <hasModel xmlns="info:fedora/fedora-system:def/model#" rdf:resource="info:fedora/si:peopleCModel"></hasModel>
+  </rdf:Description>
+</rdf:RDF>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="COLLECTION_POLICY" STATE="A" CONTROL_GROUP="M" VERSIONABLE="true">
+<foxml:datastreamVersion ID="COLLECTION_POLICY.0" LABEL="COLLECTION_POLICY" CREATED="2011-11-21T19:35:03.685Z" MIMETYPE="text/xml" SIZE="1409">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="si-user:10+COLLECTION_POLICY+COLLECTION_POLICY.0"/>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="COLLECTION_POLICY.1" LABEL="COLLECTION_POLICY" CREATED="2012-01-10T20:23:02.212Z" MIMETYPE="text/xml" SIZE="1925">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="si-user:10+COLLECTION_POLICY+COLLECTION_POLICY.1"/>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="COLLECTION_POLICY.2" LABEL="COLLECTION_POLICY" CREATED="2012-01-31T20:22:38.652Z" MIMETYPE="text/xml" SIZE="2319">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="si-user:10+COLLECTION_POLICY+COLLECTION_POLICY.2"/>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="COLLECTION_POLICY.3" LABEL="COLLECTION_POLICY" CREATED="2012-02-09T15:25:26.159Z" MIMETYPE="text/xml" SIZE="2319">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="si-user:10+COLLECTION_POLICY+COLLECTION_POLICY.3"/>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="COLLECTION_POLICY.4" LABEL="COLLECTION_POLICY" CREATED="2012-02-15T16:28:19.018Z" MIMETYPE="text/xml" SIZE="2413">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="si-user:10+COLLECTION_POLICY+COLLECTION_POLICY.4"/>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="COLLECTION_POLICY.5" LABEL="COLLECTION_POLICY" CREATED="2012-08-16T18:32:59.344Z" MIMETYPE="text/xml" SIZE="2354">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="si-user:10+COLLECTION_POLICY+COLLECTION_POLICY.5"/>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="COLLECTION_POLICY.6" LABEL="COLLECTION_POLICY" CREATED="2012-08-21T12:14:25.457Z" MIMETYPE="text/xml" SIZE="2354">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="si-user:10+COLLECTION_POLICY+COLLECTION_POLICY.6"/>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="COLLECTION_POLICY.7" LABEL="COLLECTION_POLICY" CREATED="2012-08-21T12:31:52.242Z" MIMETYPE="text/xml" SIZE="2377">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="si-user:10+COLLECTION_POLICY+COLLECTION_POLICY.7"/>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="COLLECTION_POLICY.8" LABEL="COLLECTION_POLICY" CREATED="2012-08-21T12:49:46.281Z" MIMETYPE="text/xml" SIZE="2377">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="si-user:10+COLLECTION_POLICY+COLLECTION_POLICY.8"/>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="COLLECTION_POLICY.9" LABEL="COLLECTION_POLICY" CREATED="2012-08-21T13:11:00.649Z" MIMETYPE="text/xml" SIZE="2377">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="si-user:10+COLLECTION_POLICY+COLLECTION_POLICY.9"/>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="COLLECTION_POLICY.10" LABEL="COLLECTION_POLICY" CREATED="2012-08-29T14:21:27.098Z" MIMETYPE="text/xml" SIZE="2377">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="si-user:10+COLLECTION_POLICY+COLLECTION_POLICY.10"/>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="EAC-CPF" STATE="A" CONTROL_GROUP="M" VERSIONABLE="true">
+<foxml:datastreamVersion ID="EAC-CPF.0" LABEL="EAC-CPF" CREATED="2011-11-21T19:35:03.722Z" MIMETYPE="text/xml" SIZE="1586">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="si-user:10+EAC-CPF+EAC-CPF.0"/>
+</foxml:datastreamVersion>
+</foxml:datastream>
+</foxml:digitalObject>

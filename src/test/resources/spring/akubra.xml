@@ -10,35 +10,27 @@
     <context:property-placeholder/>
 
     <bean name="objectStore" class="org.akubraproject.map.IdMappingBlobStore">
-        <constructor-arg value="urn:example.org:objectStore"/>
-        <constructor-arg ref="fsObjectStore"/>
-        <constructor-arg ref="fsObjectStoreMapper"/>
+        <constructor-arg value="urn:edu.si.fcrepo:objectStore"/>
+        <constructor-arg ref="cpObjectStore"/>
+        <constructor-arg ref="mapper"/>
     </bean>
 
-    <bean name="fsObjectStore" class="org.akubraproject.fs.FSBlobStore">
-        <constructor-arg value="urn:example.org:fsObjectStore"/>
-        <constructor-arg value="${target}/test-classes/objectStore"/>
-    </bean>
-
-    <bean name="fsObjectStoreMapper"
-        class="org.fcrepo.server.storage.lowlevel.akubra.HashPathIdMapper">
-        <constructor-arg value="##"/>
+    <bean name="cpObjectStore" class="edu.si.fcrepo.integration.classpath.ClasspathBlobStore">
+        <constructor-arg value="urn:edu.si.fcrepo:cpObjectStore"/>
+        <constructor-arg value="objectStore"/>
     </bean>
 
     <bean name="datastreamStore" class="org.akubraproject.map.IdMappingBlobStore">
-        <constructor-arg value="urn:fedora:datastreamStore"/>
-        <constructor-arg ref="fsDatastreamStore"/>
-        <constructor-arg ref="fsDatastreamStoreMapper"/>
+        <constructor-arg value="urn:edu.si.fcrepo:datastreamStore"/>
+        <constructor-arg ref="cpDatastreamStore"/>
+        <constructor-arg ref="mapper"/>
     </bean>
 
-    <bean name="fsDatastreamStore" class="org.akubraproject.fs.FSBlobStore">
-        <constructor-arg value="urn:example.org:fsDatastreamStore"/>
-        <constructor-arg value="${target}/test-classes/datastreamStore"/>
+    <bean name="cpDatastreamStore" class="edu.si.fcrepo.integration.classpath.ClasspathBlobStore">
+        <constructor-arg value="urn:edu.si.fcrepo:cpDatastreamStore"/>
+        <constructor-arg value="datastreamStore"/>
     </bean>
 
-    <bean name="fsDatastreamStoreMapper"
-        class="org.fcrepo.server.storage.lowlevel.akubra.HashPathIdMapper">
-        <constructor-arg value="##"/>
-    </bean>
+    <bean name="mapper" class="edu.si.fcrepo.integration.TestIdMapper"/>
 
 </beans>

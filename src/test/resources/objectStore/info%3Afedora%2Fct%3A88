@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" PID="ct:88"
+xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+<foxml:objectProperties>
+<foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Latta 2"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="forresterT"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2015-08-28T13:40:03.367Z"/>
+<foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2015-08-28T13:42:37.293Z"/>
+</foxml:objectProperties>
+<foxml:datastream ID="AUDIT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="AUDIT.0" LABEL="Audit Trail for this object" CREATED="2015-08-28T13:40:03.367Z" MIMETYPE="text/xml" FORMAT_URI="info:fedora/fedora-system:format/xml.fedora.audit">
+<foxml:xmlContent>
+<audit:auditTrail xmlns:audit="info:fedora/fedora-system:def/audit#">
+<audit:record ID="AUDREC1">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>MANIFEST</audit:componentID>
+<audit:responsibility>camelProcess</audit:responsibility>
+<audit:date>2015-08-28T13:40:03.532Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC2">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>FGDC</audit:componentID>
+<audit:responsibility>camelProcess</audit:responsibility>
+<audit:date>2015-08-28T13:40:03.661Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC3">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>RELS-EXT</audit:componentID>
+<audit:responsibility>camelProcess</audit:responsibility>
+<audit:date>2015-08-28T13:42:37.293Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+</audit:auditTrail>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="DC" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+<foxml:datastreamVersion ID="DC1.0" LABEL="Dublin Core Record for this object" CREATED="2015-08-28T13:40:03.367Z" MIMETYPE="text/xml" FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" SIZE="365">
+<foxml:xmlContent>
+<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+  <dc:title>Latta 2</dc:title>
+  <dc:identifier>ct:88</dc:identifier>
+</oai_dc:dc>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="MANIFEST" STATE="A" CONTROL_GROUP="M" VERSIONABLE="true">
+<foxml:datastreamVersion ID="MANIFEST.0" LABEL="MANIFEST" CREATED="2015-08-28T13:40:03.532Z" MIMETYPE="text/xml" SIZE="18010">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="ct:88+MANIFEST+MANIFEST.0"/>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="FGDC" STATE="A" CONTROL_GROUP="M" VERSIONABLE="true">
+<foxml:datastreamVersion ID="FGDC.0" LABEL="FGDC Record" CREATED="2015-08-28T13:40:03.661Z" MIMETYPE="text/xml" SIZE="5737">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="ct:88+FGDC+FGDC.0"/>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="RELS-EXT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="RELS-EXT.0" LABEL="RDF Statements about this object" CREATED="2015-08-28T13:42:37.293Z" MIMETYPE="application/rdf+xml" FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" SIZE="4116">
+<foxml:xmlContent>
+<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:default="http://islandora.org/ontologies/metadata#" xmlns:fedora="info:fedora/fedora-system:def/relations-external#" xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:islandora="http://islandora.ca/ontology/relsext#" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+  <rdf:Description rdf:about="info:fedora/ct:88">
+    <fedora-model:hasModel rdf:resource="info:fedora/si:cameraTrapCModel"></fedora-model:hasModel>
+    <fedora-model:hasModel rdf:resource="info:fedora/si:conceptCModel"></fedora-model:hasModel>
+    <default:orginal_metadata xmlns="http://islandora.org/ontologies/metadata#">TRUE</default:orginal_metadata>
+    <fedora:hasResource rdf:resource="info:fedora/ct:89"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:90"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:91"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:92"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:93"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:94"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:95"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:96"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:97"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:98"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:99"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:100"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:101"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:102"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:103"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:104"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:105"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:106"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:107"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:108"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:109"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:110"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:111"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:112"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:113"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:114"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:115"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:116"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:117"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:118"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:119"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:120"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:121"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:122"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:123"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:124"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:125"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:126"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:127"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:128"></fedora:hasResource>
+    <fedora:hasResource rdf:resource="info:fedora/ct:129"></fedora:hasResource>
+  </rdf:Description>
+</rdf:RDF>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+</foxml:digitalObject>

@@ -5,6 +5,8 @@ import static com.google.common.collect.ImmutableMap.of;
 import static edu.si.fcrepo.RdfVocabulary.CREATEDDATE;
 import static edu.si.fcrepo.RdfVocabulary.DISSEMINATES;
 import static edu.si.fcrepo.RdfVocabulary.DISSEMINATION_TYPE;
+import static edu.si.fcrepo.RdfVocabulary.FEDORA_OBJECT;
+import static edu.si.fcrepo.RdfVocabulary.HAS_MODEL;
 import static edu.si.fcrepo.RdfVocabulary.IS_VOLATILE;
 import static edu.si.fcrepo.RdfVocabulary.LABEL;
 import static edu.si.fcrepo.RdfVocabulary.LASTMODIFIEDDATE;
@@ -13,10 +15,11 @@ import static edu.si.fcrepo.RdfVocabulary.OWNER;
 import static edu.si.fcrepo.RdfVocabulary.STATE;
 import static edu.si.fcrepo.RdfVocabulary.state;
 import static edu.si.fcrepo.RdfVocabulary.volatility;
+import static java.time.ZoneOffset.UTC;
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static javax.xml.parsers.SAXParserFactory.newInstance;
 import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDdateTime;
 import static org.apache.jena.graph.NodeFactory.createLiteral;
-import static org.apache.jena.graph.NodeFactory.createLiteralByValue;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.graph.Triple.create;
 import static org.apache.jena.riot.Lang.RDFXML;
@@ -27,6 +30,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -44,6 +48,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RiotException;
 import org.apache.jena.riot.system.StreamRDF;
+import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 import com.github.cwilper.fcrepo.dto.core.ControlGroup;
@@ -83,7 +88,7 @@ public class ObjectProcessor implements Consumer<URI> {
     }
 
     public ObjectProcessor(final BlobStoreConnection objectStoreConnection, final BlobStoreConnection dsStoreConnection,
-                    final StreamRDF triplesSink) {
+                    final BulkStreamRDF triplesSink) {
         this.dsStoreConnection = dsStoreConnection;
         this.objectStoreConnection = objectStoreConnection;
         this.tripleSink = triplesSink;
@@ -111,13 +116,14 @@ public class ObjectProcessor implements Consumer<URI> {
                 final Datastream relsIntDatastream = object.datastreams().get("RELS-INT");
                 final Datastream relsExtDatastream = object.datastreams().get("RELS-EXT");
 
-                if (relsIntDatastream != null)
-                    parse(objectId, relsIntDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
-                parse(objectId, relsExtDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
                 parse(objectId, dcDatastream, dcXML -> {
                     final SAXParser parser = saxFactory.newSAXParser();
                     parser.parse(dcXML, new DublinCoreContentHandler(tripleSink, createURI(objectId.toString())));
                 });
+                if (relsIntDatastream != null)
+                    parse(objectId, relsIntDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
+                parse(objectId, relsExtDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
+
             }
         } catch (final IOException e) {
             log.error("Error reading from object: " + objectId, e);
@@ -134,7 +140,7 @@ public class ObjectProcessor implements Consumer<URI> {
         try (InputStream rdf = getDatastreamContent(ds)) {
             parse.accept(rdf);
         } catch (final Exception e) {
-            final String verb = errorMessageVerbs.getOrDefault((e.getClass()), "extract triples from");
+            final String verb = errorMessageVerbs.getOrDefault(e.getClass(), "extract triples from");
             log.error("Couldn't {} datastream {} from object {}!", verb, ds.id(), objectId);
             log.error("Caused by: ", e);
         }
@@ -177,16 +183,15 @@ public class ObjectProcessor implements Consumer<URI> {
      *      Fedora 3.8 documention</a>
      */
     private static Triple[] constantObjectTriples(final FedoraObject object, final Node objectUri) {
-        final Triple[] triples = new Triple[5];
+        final Triple[] triples = new Triple[6];
         triples[0] = create(objectUri, LABEL, createLiteral(object.label()));
         triples[1] = create(objectUri, OWNER, createLiteral(object.ownerId()));
         triples[2] = create(objectUri, STATE, state(object.state()));
         final Date createdDate = object.createdDate();
         final Date lastModifiedDate = object.lastModifiedDate();
-        //final String createdLiteral = ISO_DATE_TIME.format(createdDate.toInstant());
-        //final String lastModifiedLiteral = ISO_DATE_TIME.format(lastModifiedDate.toInstant());
-        triples[3] = create(objectUri, CREATEDDATE, createLiteralByValue(createdDate, XSDdateTime));
-        triples[4] = create(objectUri, LASTMODIFIEDDATE, createLiteralByValue(lastModifiedDate, XSDdateTime));
+        triples[3] = create(objectUri, CREATEDDATE, createLiteral(isoDate(createdDate), XSDdateTime));
+        triples[4] = create(objectUri, LASTMODIFIEDDATE, createLiteral(isoDate(lastModifiedDate), XSDdateTime));
+        triples[5] = create(objectUri, HAS_MODEL, FEDORA_OBJECT);
         return triples;
     }
 
@@ -199,17 +204,22 @@ public class ObjectProcessor implements Consumer<URI> {
      *      Fedora 3.8 documention</a>
      */
     private static Triple[] constantDatastreamTriples(final String objectUri, final Datastream ds) {
+        final String dsId = ds.id();
+        if (dsId.equals("AUDIT")) return new Triple[0];
         final Triple[] triples = new Triple[6];
-        final Node dsUri = createURI(objectUri + "/" + ds.id());
+        final Node dsUri = createURI(objectUri + "/" + dsId);
         final DatastreamVersion latestVersion = ds.versions().first();
         triples[0] = create(dsUri, MIME_TYPE, createLiteral(latestVersion.mimeType()));
         triples[1] = create(dsUri, STATE, state(ds.state()));
         final Date lastModifiedDate = latestVersion.createdDate();
-        //final String lastModifiedLiteral = ISO_DATE_TIME.format(lastModifiedDate.toInstant());
-        triples[2] = create(dsUri, LASTMODIFIEDDATE, createLiteralByValue(lastModifiedDate, XSDdateTime));
+        triples[2] = create(dsUri, LASTMODIFIEDDATE, createLiteral(isoDate(lastModifiedDate), XSDdateTime));
         triples[3] = create(dsUri, IS_VOLATILE, volatility(ds.controlGroup()));
         triples[4] = create(createURI(objectUri), DISSEMINATES, dsUri);
-        triples[5] = create(dsUri, DISSEMINATION_TYPE, createURI("info:fedora/*/" + ds.id()));
+        triples[5] = create(dsUri, DISSEMINATION_TYPE, createURI("info:fedora/*/" + dsId));
         return triples;
+    }
+
+    private static String isoDate(final Date d) {
+        return ZonedDateTime.ofInstant(d.toInstant(), UTC).format(ISO_INSTANT);
     }
 }

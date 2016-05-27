@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" PID="ct:90"
+xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+<foxml:objectProperties>
+<foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="3669s1i2"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="forresterT"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2015-08-28T13:40:07.550Z"/>
+<foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2015-08-28T13:40:11.150Z"/>
+</foxml:objectProperties>
+<foxml:datastream ID="AUDIT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="AUDIT.0" LABEL="Audit Trail for this object" CREATED="2015-08-28T13:40:07.550Z" MIMETYPE="text/xml" FORMAT_URI="info:fedora/fedora-system:format/xml.fedora.audit">
+<foxml:xmlContent>
+<audit:auditTrail xmlns:audit="info:fedora/fedora-system:def/audit#">
+<audit:record ID="AUDREC1">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>OBJ</audit:componentID>
+<audit:responsibility>camelProcess</audit:responsibility>
+<audit:date>2015-08-28T13:40:07.593Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC2">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>TN</audit:componentID>
+<audit:responsibility>camelProcess</audit:responsibility>
+<audit:date>2015-08-28T13:40:08.218Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC3">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>RELS-EXT</audit:componentID>
+<audit:responsibility>camelProcess</audit:responsibility>
+<audit:date>2015-08-28T13:40:08.314Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC4">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>FITS</audit:componentID>
+<audit:responsibility>camelProcess</audit:responsibility>
+<audit:date>2015-08-28T13:40:11.068Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC5">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>MODS</audit:componentID>
+<audit:responsibility>camelProcess</audit:responsibility>
+<audit:date>2015-08-28T13:40:11.150Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+</audit:auditTrail>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="DC" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+<foxml:datastreamVersion ID="DC1.0" LABEL="Dublin Core Record for this object" CREATED="2015-08-28T13:40:07.550Z" MIMETYPE="text/xml" FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" SIZE="366">
+<foxml:xmlContent>
+<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+  <dc:title>3669s1i2</dc:title>
+  <dc:identifier>ct:90</dc:identifier>
+</oai_dc:dc>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="OBJ" STATE="A" CONTROL_GROUP="M" VERSIONABLE="false">
+<foxml:datastreamVersion ID="OBJ.0" LABEL="3669s1i2" CREATED="2015-08-28T13:40:07.593Z" MIMETYPE="image/jpeg" SIZE="1267587">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="ct:90+OBJ+OBJ.0"/>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="TN" STATE="A" CONTROL_GROUP="M" VERSIONABLE="false">
+<foxml:datastreamVersion ID="TN.0" LABEL="Thumbnail" CREATED="2015-08-28T13:40:08.218Z" MIMETYPE="image/jpeg" SIZE="5376">
+<foxml:contentLocation TYPE="INTERNAL_ID" REF="ct:90+TN+TN.0"/>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="RELS-EXT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="RELS-EXT.0" LABEL="RDF Statements about this object" CREATED="2015-08-28T13:40:08.314Z" MIMETYPE="application/rdf+xml" FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" SIZE="850">
+<foxml:xmlContent>
+<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:default="http://islandora.org/ontologies/metadata#" xmlns:fedora="info:fedora/fedora-system:def/relations-external#" xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:islandora="http://islandora.ca/ontology/relsext#" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+  <rdf:Description rdf:about="info:fedora/ct:90">
+    <fedora-model:hasModel rdf:resource="info:fedora/si:generalImageCModel"></fedora-model:hasModel>
+    <fedora-model:hasModel rdf:resource="info:fedora/si:resourceCModel"></fedora-model:hasModel>
+    <default:orginal_metadata xmlns="http://islandora.org/ontologies/metadata#">TRUE</default:orginal_metadata>
+  </rdf:Description>
+</rdf:RDF>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="FITS" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="FITS.0" LABEL="FITS Generated Image Metadata" CREATED="2015-08-28T13:40:11.068Z" MIMETYPE="text/xml" SIZE="5769">
+<foxml:xmlContent>
+<fits xmlns="http://hul.harvard.edu/ois/xml/ns/fits/fits_output" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" timestamp="8/28/15 9:40 AM" version="0.6.2" xsi:schemaLocation="http://hul.harvard.edu/ois/xml/ns/fits/fits_output http://hul.harvard.edu/ois/xml/xsd/fits/fits_output.xsd">
+  <identification>
+    <identity format="Exchangeable Image File Format" mimetype="image/jpeg" toolname="FITS" toolversion="0.6.2">
+      <tool toolname="file utility" toolversion="5.04"></tool>
+      <tool toolname="Exiftool" toolversion="9.40"></tool>
+      <tool toolname="Droid" toolversion="3.0"></tool>
+      <tool toolname="NLNZ Metadata Extractor" toolversion="3.4GA"></tool>
+      <version toolname="Droid" toolversion="3.0">2.1</version>
+      <externalIdentifier toolname="Droid" toolversion="3.0" type="puid">x-fmt/390</externalIdentifier>
+    </identity>
+  </identification>
+  <fileinfo>
+    <size toolname="Jhove" toolversion="1.5">1267587</size>
+    <creatingApplicationName status="SINGLE_RESULT" toolname="NLNZ Metadata Extractor" toolversion="3.4GA">BS680BWNx02128</creatingApplicationName>
+    <lastmodified status="SINGLE_RESULT" toolname="Exiftool" toolversion="9.40">2015:08:28 09:40:02-04:00</lastmodified>
+    <created toolname="Exiftool" toolversion="9.40">2014:10:16 18:02:15</created>
+    <filepath status="SINGLE_RESULT" toolname="OIS File Information" toolversion="0.1">/utility/sidora/apache-servicemix-5.4.0/CameraTrapData/p1d3669/3669s1i2.JPG</filepath>
+    <filename status="SINGLE_RESULT" toolname="OIS File Information" toolversion="0.1">/utility/sidora/apache-servicemix-5.4.0/CameraTrapData/p1d3669/3669s1i2.JPG</filename>
+    <md5checksum status="SINGLE_RESULT" toolname="OIS File Information" toolversion="0.1">6d08ff6b19ed218354cf8242cd1ba9bc</md5checksum>
+    <fslastmodified status="SINGLE_RESULT" toolname="OIS File Information" toolversion="0.1">1440769202000</fslastmodified>
+  </fileinfo>
+  <filestatus></filestatus>
+  <metadata>
+    <image>
+      <compressionScheme status="SINGLE_RESULT" toolname="Exiftool" toolversion="9.40">JPEG (old-style)</compressionScheme>
+      <imageWidth toolname="Exiftool" toolversion="9.40">3264</imageWidth>
+      <imageHeight toolname="Exiftool" toolversion="9.40">2448</imageHeight>
+      <YCbCrSubSampling status="SINGLE_RESULT" toolname="Exiftool" toolversion="9.40">2 1</YCbCrSubSampling>
+      <YCbCrPositioning status="CONFLICT" toolname="Exiftool" toolversion="9.40">Co-sited</YCbCrPositioning>
+      <YCbCrPositioning status="CONFLICT" toolname="NLNZ Metadata Extractor" toolversion="3.4GA">2</YCbCrPositioning>
+      <orientation toolname="Exiftool" toolversion="9.40">normal*</orientation>
+      <samplingFrequencyUnit status="CONFLICT" toolname="Exiftool" toolversion="9.40">inches</samplingFrequencyUnit>
+      <samplingFrequencyUnit status="CONFLICT" toolname="NLNZ Metadata Extractor" toolversion="3.4GA">in.</samplingFrequencyUnit>
+      <xSamplingFrequency toolname="Exiftool" toolversion="9.40">96</xSamplingFrequency>
+      <ySamplingFrequency toolname="Exiftool" toolversion="9.40">96</ySamplingFrequency>
+      <bitsPerSample toolname="Exiftool" toolversion="9.40">8 8 8</bitsPerSample>
+      <captureDevice status="SINGLE_RESULT" toolname="Exiftool" toolversion="9.40">Digital Camera</captureDevice>
+      <scanningSoftwareName status="SINGLE_RESULT" toolname="Exiftool" toolversion="9.40">BS680BWNx02128</scanningSoftwareName>
+      <fNumber toolname="Exiftool" toolversion="9.40">2.8</fNumber>
+      <exposureTime toolname="Exiftool" toolversion="9.40">0</exposureTime>
+      <exposureProgram status="CONFLICT" toolname="Exiftool" toolversion="9.40">Aperture-priority AE</exposureProgram>
+      <exposureProgram status="CONFLICT" toolname="NLNZ Metadata Extractor" toolversion="3.4GA">Aperture priority</exposureProgram>
+      <isoSpeedRating status="SINGLE_RESULT" toolname="Exiftool" toolversion="9.40">100</isoSpeedRating>
+      <exifVersion status="CONFLICT" toolname="Exiftool" toolversion="9.40">0210</exifVersion>
+      <exifVersion status="CONFLICT" toolname="NLNZ Metadata Extractor" toolversion="3.4GA">0120</exifVersion>   
+   <shutterSpeedValue status="CONFLICT" toolname="Exiftool" toolversion="9.40">1</shutterSpeedValue>
+      <shutterSpeedValue status="CONFLICT" toolname="NLNZ Metadata Extractor" toolversion="3.4GA">0.0</shutterSpeedValue>
+      <apertureValue status="CONFLICT" toolname="Exiftool" toolversion="9.40">2.6</apertureValue>
+      <apertureValue status="CONFLICT" toolname="NLNZ Metadata Extractor" toolversion="3.4GA">2.8</apertureValue>
+      <exposureBiasValue status="CONFLICT" toolname="Exiftool" toolversion="9.40">+2</exposureBiasValue>
+      <exposureBiasValue status="CONFLICT" toolname="NLNZ Metadata Extractor" toolversion="3.4GA">[Ljava.lang.Object;@28b03831</exposureBiasValue>
+      <maxApertureValue status="CONFLICT" toolname="Exiftool" toolversion="9.40">2.6</maxApertureValue>
+      <maxApertureValue status="CONFLICT" toolname="NLNZ Metadata Extractor" toolversion="3.4GA">2.8</maxApertureValue>
+      <meteringMode toolname="Exiftool" toolversion="9.40">Average</meteringMode>
+      <lightSource toolname="Exiftool" toolversion="9.40">Daylight</lightSource>
+      <flash status="CONFLICT" toolname="Exiftool" toolversion="9.40">No Flash</flash>
+      <flash status="CONFLICT" toolname="NLNZ Metadata Extractor" toolversion="3.4GA">Flash did not fire</flash>
+      <exposureIndex toolname="Exiftool" toolversion="9.40">1</exposureIndex>
+      <sensingMethod status="CONFLICT" toolname="Exiftool" toolversion="9.40">One-chip color area</sensingMethod>
+      <sensingMethod status="CONFLICT" toolname="NLNZ Metadata Extractor" toolversion="3.4GA">One-chip color area sensor</sensingMethod>
+    </image>
+  </metadata>
+</fits>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="MODS" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+<foxml:datastreamVersion ID="MODS.0" LABEL="MODS Record" CREATED="2015-08-28T13:40:11.150Z" MIMETYPE="text/xml" SIZE="1502">
+<foxml:xmlContent>
+<mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <titleInfo>
+    <title>Latta 2, image 2 of 3</title>
+  </titleInfo>
+  <identifier type="Image ID">3669s1i2</identifier>
+  <relatedItem>
+    <identifier type="Image Sequence ID">p1d3669s1</identifier>
+  </relatedItem>
+  <typeOfResource>still image</typeOfResource>
+  <abstract></abstract>
+  <physicalDescription>
+    <digitalOrigin>born digital</digitalOrigin>
+  </physicalDescription>
+  <subject authority="Camera Trap Data Network Photo Type">
+    <topic>unknown</topic>
+  </subject>
+  <subject authorityURI="http://www.iucnredlist.org">
+    <topic></topic>
+  </subject>
+  <subject>
+    <topic></topic>
+    <geographic></geographic>
+    <cartographics>
+      <coordinates></coordinates>
+    </cartographics>
+  </subject>
+  <name>
+    <namePart></namePart>
+    <role>
+      <roleTerm authority="marcrelator" type="text"></roleTerm>
+    </role>
+  </name>
+  <note type="Interest Rank">None</note>
+  <originInfo>
+    <dateCaptured>2014:10:16 18:02:15</dateCaptured>
+    <dateOther type="Embargo Period End Date"></dateOther>
+  </originInfo>
+  <location>
+    <physicalLocation></physicalLocation>
+    <holdingSimple>
+      <copyInformation>
+        <subLocation></subLocation>
+      </copyInformation>
+    </holdingSimple>
+  </location>
+  <accessCondition type="restriction on access"></accessCondition>
+  <accessCondition type="use and reproduction"></accessCondition>
+</mods>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+</foxml:digitalObject>
