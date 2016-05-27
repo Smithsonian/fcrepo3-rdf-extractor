@@ -73,7 +73,7 @@ public class Extract implements Runnable {
     @Once
     public String outputFile;
 
-    @Option(name = {"-a", "--append"}, title = "Append",
+    @Option(name = {"--append"}, title = "Append",
                     description = "Whether to append to the output file (defaults to false)")
     @Once
     public boolean append = false;

@@ -13,6 +13,23 @@
 
   <name>fcrepo3-rdf-extractor</name>
 
+  <scm>
+    <url>https://github.com/ajs6f/fcrepo3-rdf-extractor</url>
+  </scm>
+  <url>https://github.com/ajs6f/fcrepo3-rdf-extractor</url>
+  <description>A utility to extract RDF triples from Fedora Comons 3 Akubra-based persistence stores.</description>
+
+  <developers>
+    <developer>
+      <id>ajs6f</id>
+      <email>adam@asoroka.com</email>
+      <timezone>America/New_York</timezone>
+      <roles>
+        <role>Originator</role>
+      </roles>
+    </developer>
+  </developers>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <akubra.version>0.4.0</akubra.version>
@@ -31,12 +48,6 @@
 
 
   <dependencies>
-
-    <dependency>
-      <groupId>fast-md5</groupId>
-      <artifactId>fast-md5</artifactId>
-      <version>2.5</version>
-    </dependency>
 
     <dependency>
       <groupId>org.akubraproject</groupId>
@@ -63,21 +74,16 @@
     </dependency>
 
     <dependency>
-      <groupId>org.akubraproject</groupId>
-      <artifactId>akubra-map</artifactId>
-      <version>${akubra.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava-collections</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
       <groupId>com.github.cwilper.fcrepo-misc</groupId>
       <artifactId>fcrepo-dto-foxml</artifactId>
       <version>1.0.0</version>
+    </dependency>
+
+    <!-- For emulating the hashing behavior of Fedora 3 -->
+    <dependency>
+      <groupId>fast-md5</groupId>
+      <artifactId>fast-md5</artifactId>
+      <version>2.5</version>
     </dependency>
 
     <dependency>
@@ -115,6 +121,7 @@
       <version>${spring.version}</version>
     </dependency>
 
+    <!-- CLI parsing -->
     <dependency>
       <groupId>com.github.rvesse</groupId>
       <artifactId>airline</artifactId>
@@ -172,7 +179,7 @@
       <version>0.9.10</version>
       <scope>test</scope>
     </dependency>
-    
+
   </dependencies>
 
   <build>
@@ -212,12 +219,40 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.3</version>
+        <configuration>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer
+                  implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>edu.si.fcrepo.Extract</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-  <scm>
-    <url>https://github.com/ajs6f/fcrepo3-rdf-extractor</url>
-  </scm>
-  <url>https://github.com/ajs6f/fcrepo3-rdf-extractor</url>
-  <description>
-A utility to extract RDF triples from Fedora Comons 3 Akubra-based persistence stores. </description>
+
 </project>
