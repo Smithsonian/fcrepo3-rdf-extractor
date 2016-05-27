@@ -1,7 +1,6 @@
 
 package edu.si.fcrepo;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static edu.si.fcrepo.RdfVocabulary.CREATEDDATE;
 import static edu.si.fcrepo.RdfVocabulary.DISSEMINATES;
 import static edu.si.fcrepo.RdfVocabulary.DISSEMINATION_TYPE;
@@ -19,6 +18,7 @@ import static java.time.ZoneOffset.UTC;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static javax.xml.parsers.SAXParserFactory.newInstance;
 import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDdateTime;
+import static org.apache.jena.ext.com.google.common.collect.ImmutableMap.of;
 import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.graph.Triple.create;
@@ -51,6 +51,7 @@ import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
+
 import com.github.cwilper.fcrepo.dto.core.ControlGroup;
 import com.github.cwilper.fcrepo.dto.core.Datastream;
 import com.github.cwilper.fcrepo.dto.core.DatastreamVersion;

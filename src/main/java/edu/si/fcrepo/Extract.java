@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import org.akubraproject.BlobStore;
 import org.akubraproject.BlobStoreConnection;
 import org.apache.jena.atlas.io.IO;
+import org.apache.jena.tdb.TDB;
 import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,10 @@ public class Extract implements Runnable {
     private static final int MEGA = 1 << 20;
 
     private static final Logger log = getLogger(Extract.class);
+
+    static {
+        TDB.init();
+    }
 
     @Option(name = {"-a", "--akubra"}, title = "Akubra", description = "The Akubra context file from which to read",
                     arity = 1)
@@ -110,6 +115,8 @@ public class Extract implements Runnable {
     private Stream<URI> objectBlobUris;
 
     private Consumer<URI> objectProcessor;
+
+    private volatile int counter = 0;
 
     public static void main(final String[] args) {
         final SingleCommand<Extract> cliParser = singleCommand(Extract.class);
@@ -177,7 +184,9 @@ public class Extract implements Runnable {
     public void run() {
         // let 'er rip
         tripleSink.startBulk();
-        extractionThreads.execute(() -> objectBlobUris.parallel().forEach(objectProcessor));
+        extractionThreads.execute(() -> objectBlobUris.parallel().peek(uri -> {
+            if (counter++ % 1000 == 0) log.info("Reached {} objects.", counter);
+        }).forEach(objectProcessor));
         extractionThreads.awaitQuiescence(3, DAYS);
         try {
             tripleSink.finishBulk();
