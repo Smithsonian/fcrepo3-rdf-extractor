@@ -25,4 +25,4 @@ where options include:
 ```
 Any further arguments are understood as selecting particular object URIs to process, for example for testing purposes. The default is to process all contents in the `BlobStore` bean named `objectStore` in the selected Akubra configuration.
 
-This utility fully streams processing so should not require a large heap allocation.
+This utility fully streams processing so should not require a large heap allocation. If you'd like to adjust the logging settings for this utility, use the standard `-cp` argument to `java` to put a `logback.xml` file into play.
