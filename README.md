@@ -22,7 +22,8 @@ where options include:
 -n, --numThreads: The number of threads to use in parallel for extraction and for serialization (defaults to the number of available processors),
 -q, --queueSize: The number of tuples to queue into serialization (defaults to a megatuple)
 --append: Whether to append to the output file (defaults to false)
+--logback: The location of an optional logback.xml configuration file
 ```
 Any further arguments are understood as selecting particular object URIs to process, for example for testing purposes. The default is to process all contents in the `BlobStore` bean named `objectStore` in the selected Akubra configuration.
 
-This utility fully streams processing so should not require a large heap allocation. If you'd like to adjust the logging settings for this utility, use the standard `-cp` argument to `java` to put a `logback.xml` file on the classpath and into play.
+This utility fully streams processing so should not require a large heap allocation. 
