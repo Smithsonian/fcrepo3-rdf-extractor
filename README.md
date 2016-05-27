@@ -13,7 +13,7 @@ java -jar fcrepo3-rdf-extractor-0.0.1-SNAPSHOT.jar [OPTIONS]
 where options include:
 #### REQUIRED
 ```
--a, --akubra: The Akubra context file from which to read
+-a, --akubra: The Akubra configuration Spring XML file from which to read
 -o, --outputFile: The output file into which to extract triples, which will contain standard N-Quads
 ```
 #### OPTIONAL
