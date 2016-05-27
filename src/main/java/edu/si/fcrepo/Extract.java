@@ -28,6 +28,7 @@ import org.akubraproject.BlobStoreConnection;
 import org.apache.jena.atlas.io.IO;
 import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.Lifecycle;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -37,6 +38,10 @@ import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Once;
 import com.github.rvesse.airline.annotations.restrictions.Required;
+
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
 
 @Command(name = "extract", description = "Extractor from Akubra to Quads")
 public class Extract implements Runnable {
@@ -78,6 +83,11 @@ public class Extract implements Runnable {
     @Once
     public boolean append = false;
 
+    @Option(name = {"--logback"}, title = "LogbackConfig",
+                    description = "The location of an optional logback.xml configuration file")
+    @Once
+    public String logConfig = null;
+
     @Arguments(description = "URIs to process (default is to process all contents)")
     public List<URI> uris;
 
@@ -106,10 +116,22 @@ public class Extract implements Runnable {
         final Extract extractor = cliParser.parse(args);
         extractor.init();
         extractor.run();
-
     }
 
     public void init() {
+
+        if (logConfig != null) {
+            final LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+            context.reset();
+            final JoranConfigurator configurator = new JoranConfigurator();
+            configurator.setContext(context);
+            try {
+                configurator.doConfigure(logConfig);
+            } catch (final JoranException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         extractionThreads = new ForkJoinPool(numThreads);
         log.info("Using {} threads for extraction and a queue size of {}.", numThreads, queueSize);
         if (outputFile == null) bitSink = out;
