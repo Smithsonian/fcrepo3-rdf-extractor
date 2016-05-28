@@ -182,7 +182,7 @@ public class Extract implements Runnable {
 
     @Override
     public void run() {
-        // let 'er rip
+        log.info("Beginning extraction.");
         tripleSink.startBulk();
         extractionThreads.execute(() -> objectBlobUris.parallel().peek(uri -> {
             if (counter++ % 1000 == 0) log.info("Reached {} objects.", counter);
@@ -196,6 +196,7 @@ public class Extract implements Runnable {
             dsStoreConnection.close();
             objectStoreConnection.close();
             ((Lifecycle) akubraContext).stop();
+            log.info("Finished extraction.");
         } catch (final IOException e) {
             throw new IOError(e);
         } catch (@SuppressWarnings("unused") final InterruptedException e) {
