@@ -2,8 +2,6 @@
 package edu.si.fcrepo;
 
 import static java.lang.Thread.currentThread;
-import static org.apache.jena.riot.Lang.NTRIPLES;
-import static org.apache.jena.riot.RDFDataMgr.write;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.IOException;
@@ -29,10 +27,10 @@ public class TestHelpers {
 
     public static String ntriples(final Model m) {
         try (StringWriter w = new StringWriter()) {
-            write(w, m, NTRIPLES);
+            m.write(w, "N-TRIPLE");
             return w.toString();
         } catch (final IOException e) {
-            throw new AssertionError(e);
+            throw new RuntimeException(e);
         }
     }
 

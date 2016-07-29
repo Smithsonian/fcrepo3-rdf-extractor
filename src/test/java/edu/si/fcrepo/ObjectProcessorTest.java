@@ -1,15 +1,8 @@
 
 package edu.si.fcrepo;
 
-import static edu.si.fcrepo.DublinCoreContentHandler.DC_NAMESPACE;
-import static edu.si.fcrepo.RdfVocabulary.DISSEMINATES;
 import static edu.si.fcrepo.TestHelpers.loadResource;
-import static org.apache.jena.graph.NodeFactory.createLiteral;
-import static org.apache.jena.graph.NodeFactory.createURI;
-import static org.apache.jena.graph.Triple.create;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.riot.Lang.NTRIPLES;
-import static org.apache.jena.riot.RDFDataMgr.read;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -21,18 +14,15 @@ import org.akubraproject.BlobStore;
 import org.akubraproject.BlobStoreConnection;
 import org.akubraproject.mem.MemBlobStore;
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.lang.CollectorStreamRDF;
 import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
 import org.junit.Test;
 
 public class ObjectProcessorTest {
 
-    private static final Node DC_IDENTIFIER = createURI(DC_NAMESPACE + "identifier");
+    private static final String OBJECT_URI = "info:fedora/simple:object";
 
     private final BlobStore objectStore = new MemBlobStore();
 
@@ -43,41 +33,33 @@ public class ObjectProcessorTest {
         final CollectingBulkStreamRDF tuples = new CollectingBulkStreamRDF();
         final BlobStoreConnection conn = objectStore.openConnection(null, null);
         // load some simple FOXML into our store
-        final URI blobId = URI.create("info:fedora/demo:999");
+        final URI blobId = URI.create(OBJECT_URI);
         final Blob blob = conn.getBlob(blobId, null);
         IOUtils.copy(loadResource("simple-foxml.xml"), blob.openOutputStream(0, true));
         final ObjectProcessor testProcessor = new ObjectProcessor(conn, null, tuples);
         // process the FOXML from that store
-        testProcessor.accept(URI.create("info:fedora/demo:999"));
+        testProcessor.accept(URI.create(OBJECT_URI));
         // examine the resulting tuples
         final List<Triple> triples = tuples.getTriples();
-        final Node objectUri = createURI("info:fedora/demo:999");
-        final Triple pidTriple = create(objectUri, DC_IDENTIFIER, createLiteral("demo:999"));
-        assertTrue("Didn't find PID triple!", triples.contains(pidTriple));
-        final Triple dissCrazyTriple = create(objectUri, DISSEMINATES, createURI("info:fedora/demo:999/CRAZYDS"));
-        assertTrue("Didn't find disseminates-CRAZYDS triple!", triples.contains(dissCrazyTriple));
-
-        System.out.println(triples.size() + " triples");
         assertTrue("Should extract no quads!", tuples.getQuads().isEmpty());
         final Model results = createDefaultModel();
         results.setNsPrefixes(tuples.getPrefixes().getMappingCopyStr());
         triples.forEach(t -> results.add(results.asStatement(t)));
-        RDFDataMgr.write(System.out, results, Lang.NTRIPLES);
         final Model rubric = createDefaultModel();
-        read(rubric, TestHelpers.loadResource("simple.nt"), NTRIPLES);
+        rubric.read(TestHelpers.loadResource("simple.nt"), null, "N-TRIPLES");
         assertTrue("Did not find expected triples!", results.isIsomorphicWith(rubric));
     }
 
-    private static class CollectingBulkStreamRDF extends CollectorStreamRDF implements BulkStreamRDF {
+    static class CollectingBulkStreamRDF extends CollectorStreamRDF implements BulkStreamRDF {
 
         @Override
-        public void start() {}
+        public void start() {/* NO OP */}
 
         @Override
-        public void startBulk() { }
+        public void startBulk() {/* NO OP */}
 
         @Override
-        public void finishBulk() { }
+        public void finishBulk() {/* NO OP */}
 
     }
 }

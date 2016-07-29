@@ -166,8 +166,8 @@ public class Extract implements Runnable {
         } catch (final IOException e) {
             throw new IOError(e);
         }
-        final LockingWriterStreamRDFPlain syncedTripleSink = new LockingWriterStreamRDFPlain(IO.wrapUTF8(bitSink));
-        final GraphStreamRDF graphWrappingTripleSink = new GraphStreamRDF(createURI(graphName), syncedTripleSink);
+        final SynchronizedWriterStreamRDFPlain syncedTripleSink = new SynchronizedWriterStreamRDFPlain(IO.wrapUTF8(bitSink));
+        final SingleGraphStreamRDF graphWrappingTripleSink = new SingleGraphStreamRDF(createURI(graphName), syncedTripleSink);
         tripleSink = new QueueingTripleStreamRDF(graphWrappingTripleSink, numThreads, queueSize);
         objectProcessor = new ObjectProcessor(objectStoreConnection, dsStoreConnection, tripleSink);
 

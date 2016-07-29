@@ -4,11 +4,14 @@ package edu.si.fcrepo;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.IntStream.range;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.IntConsumer;
+
 import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWrapper;
@@ -27,46 +30,51 @@ public class QueueingTripleStreamRDF extends StreamRDFWrapper implements BulkStr
 
     private final BlockingQueue<Triple> queue;
 
-    private volatile boolean started = false, continueUnloading = true;
+    private final BlockingQueue<Triple> queue() { return queue; }
 
-    private final ThreadPoolExecutor unloadingThreads;
+    private volatile boolean started = false, continueUnqueueing = true;
 
-    public QueueingTripleStreamRDF(final StreamRDF sink, final int numUnloadingThreads, final int queueSize) {
-        this(sink, numUnloadingThreads, new LinkedBlockingQueue<>(queueSize));
+    private final ThreadPoolExecutor unqueueingThreads;
+
+    private final ThreadPoolExecutor unqueueingThreads() { return unqueueingThreads; }
+
+    public QueueingTripleStreamRDF(final StreamRDF sink, final int numThreads, final int queueSize) {
+        this(sink, numThreads, new LinkedBlockingQueue<>(queueSize));
     }
 
-    public QueueingTripleStreamRDF(final StreamRDF sink, final int numUnloadingThreads,
-                    final BlockingQueue<Triple> queue) {
+    public QueueingTripleStreamRDF(final StreamRDF sink, final int numThreads, final BlockingQueue<Triple> queue) {
         super(sink);
         this.queue = queue;
-        this.unloadingThreads = new ThreadPoolExecutor(numUnloadingThreads, numUnloadingThreads, 0L, MILLISECONDS,
-                        new LinkedBlockingQueue<>(numUnloadingThreads));
+        final LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>(numThreads);
+        this.unqueueingThreads = new ThreadPoolExecutor(numThreads, numThreads, 0L, MILLISECONDS, workQueue);
     }
+
+    final IntConsumer buildLoader = threadId -> unqueueingThreads().submit(() -> {
+            final String threadName = getClass().getSimpleName() + " unqueueing thread " + threadId;
+            log.debug("{} starting unqueueing…", threadName);
+            try {
+                while (continueUnqueueing) {
+                    log.debug("Waiting for triple…");
+                    final Triple t = queue().poll(2, SECONDS);
+                    if (t != null) {
+                        log.debug("Unqueued: {}, leaving {} queued.", t, queue().size());
+                        sink(t);
+                    }
+                }
+                log.debug("{} stopped unqueue.", threadName);
+            } catch (final InterruptedException e) {
+                log.warn(threadName + " was interrupted!", e);
+            }
+        });
+
 
     @Override
     public void startBulk() {
         synchronized (this) {
             if (!started) {
-                final int numThreads = unloadingThreads.getCorePoolSize();
-                log.info("Starting {} unloader threads.", numThreads);
-                for (int i = 0; i < numThreads; i++)
-                    unloadingThreads.submit(() -> {
-                        try {
-                            while (continueUnloading) {
-                                log.debug("Waiting for triple…");
-                                Triple t = null;
-                                while (continueUnloading && t == null) {
-                                    t = queue.poll(2, SECONDS);
-                                    if (t != null) {
-                                        log.debug("Unqueued triple: {}", t);
-                                        log.debug("Leaving {} triples on-queue.", queue.size());
-                                        sink(t);
-                                    }
-                                }
-                            }
-                            log.debug("Stopped unloading.");
-                        } catch (@SuppressWarnings("unused") final InterruptedException e) {/* NO OP */}
-                    });
+                final int numThreads = unqueueingThreads().getCorePoolSize();
+                log.info("Starting {} unqueueing threads.", numThreads);
+                range(1, numThreads).forEachOrdered(buildLoader);
                 started = true;
             }
         }
@@ -74,16 +82,20 @@ public class QueueingTripleStreamRDF extends StreamRDFWrapper implements BulkStr
 
     private void sink(final Triple t) {
         sink.triple(t);
-        log.debug("Sunk triple: {}", t);
+        log.debug("Unqueued triple: {}", t);
     }
 
     @Override
     public void finishBulk() {
-        continueUnloading = false;
-        unloadingThreads.shutdown();
+        continueUnqueueing = false;
+        log.debug("Stopped new background unqueueing.");
+        unqueueingThreads().shutdown();
+        log.debug("Shutting down old background unqueueing.");
         try {
-            unloadingThreads.awaitTermination(3, MINUTES);
-            queue.forEach(this::sink);
+            unqueueingThreads().awaitTermination(3, MINUTES);
+            log.debug("All background unqueueing stopped.");
+            queue().forEach(this::sink);
+            log.debug("All triples unqueued.");
         } catch (final InterruptedException e) {
             log.warn("Disorderly shutdown!", e);
         }
@@ -91,19 +103,17 @@ public class QueueingTripleStreamRDF extends StreamRDFWrapper implements BulkStr
     }
 
     @Override
-    public void finish() {
-        /* NO OP */
-    }
+    public void finish() {  /* NO OP: No boundaries between batches. */ }
 
     @Override
     public void triple(final Triple triple) {
-        if (continueUnloading) {
+        if (continueUnqueueing) {
             log.debug("Received triple: {}", triple);
             try {
-                queue.put(triple);
+                queue().put(triple);
                 log.debug("Queued triple: {}", triple);
             } catch (@SuppressWarnings("unused") final InterruptedException e) { /* No processing after interrupt */ }
-        } else throw new IllegalStateException("Already called #close!");
+        } else throw new IllegalStateException("Already called #finishBulk!");
     }
 
     @Override

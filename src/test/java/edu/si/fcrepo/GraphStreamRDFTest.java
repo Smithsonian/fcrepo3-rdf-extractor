@@ -24,7 +24,7 @@ public class GraphStreamRDFTest {
     @Test
     public void tripleToQuad() {
         final Node graphName = createURI("test");
-        final GraphStreamRDF testStream = new GraphStreamRDF(graphName, mockStream);
+        final SingleGraphStreamRDF testStream = new SingleGraphStreamRDF(graphName, mockStream);
         final Triple testTriple = parseTriple("(<s> <p> <o>)");
         testStream.triple(testTriple);
         verify(mockStream).quad(Quad.create(graphName, testTriple));
@@ -33,7 +33,7 @@ public class GraphStreamRDFTest {
     @Test
     public void quadToQuad() {
         final Node graphName = createURI("test");
-        final GraphStreamRDF testStream = new GraphStreamRDF(graphName, mockStream);
+        final SingleGraphStreamRDF testStream = new SingleGraphStreamRDF(graphName, mockStream);
         final Quad testQuad = parseQuad("(quad <g> <s> <p> <o2>)");
         testStream.quad(testQuad);
         verify(mockStream).quad(Quad.create(graphName, testQuad.asTriple()));

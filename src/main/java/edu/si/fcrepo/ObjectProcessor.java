@@ -77,7 +77,7 @@ public class ObjectProcessor implements Consumer<URI> {
             saxFactory.setValidating(false);
             saxFactory.setXIncludeAware(false);
             saxFactory.setSchema(null);
-        } catch (SAXException | ParserConfigurationException e) {}
+        } catch (@SuppressWarnings("unused") SAXException | ParserConfigurationException e) { /* NO OP */ }
     }
 
     private static final Logger log = getLogger(ObjectProcessor.class);
@@ -88,10 +88,10 @@ public class ObjectProcessor implements Consumer<URI> {
         default void close() {/* NO OP */}
     }
 
-    public ObjectProcessor(final BlobStoreConnection objectStoreConnection, final BlobStoreConnection dsStoreConnection,
+    public ObjectProcessor(final BlobStoreConnection objStoreConnection, final BlobStoreConnection dsStoreConnection,
                     final BulkStreamRDF triplesSink) {
         this.dsStoreConnection = dsStoreConnection;
-        this.objectStoreConnection = objectStoreConnection;
+        this.objectStoreConnection = objStoreConnection;
         this.tripleSink = triplesSink;
     }
 
@@ -117,13 +117,13 @@ public class ObjectProcessor implements Consumer<URI> {
                 final Datastream relsIntDatastream = object.datastreams().get("RELS-INT");
                 final Datastream relsExtDatastream = object.datastreams().get("RELS-EXT");
 
-                parse(objectId, dcDatastream, dcXML -> {
+                consume(objectId, dcDatastream, dcXML -> {
                     final SAXParser parser = saxFactory.newSAXParser();
                     parser.parse(dcXML, new DublinCoreContentHandler(tripleSink, createURI(objectId.toString())));
                 });
                 if (relsIntDatastream != null)
-                    parse(objectId, relsIntDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
-                parse(objectId, relsExtDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
+                    consume(objectId, relsIntDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
+                consume(objectId, relsExtDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
 
             }
         } catch (final IOException e) {
@@ -137,9 +137,9 @@ public class ObjectProcessor implements Consumer<URI> {
         void accept(E e) throws Exception;
     }
 
-    private void parse(final URI objectId, final Datastream ds, final UnsafeConsumer<InputStream> parse) {
+    private void consume(final URI objectId, final Datastream ds, final UnsafeConsumer<InputStream> parser) {
         try (InputStream rdf = getDatastreamContent(ds)) {
-            parse.accept(rdf);
+            parser.accept(rdf);
         } catch (final Exception e) {
             final String verb = errorMessageVerbs.getOrDefault(e.getClass(), "extract triples from");
             log.error("Couldn't {} datastream {} from object {}!", verb, ds.id(), objectId);
@@ -161,7 +161,6 @@ public class ObjectProcessor implements Consumer<URI> {
         final URI contentLocation = currentVersion.contentLocation();
         final ControlGroup controlGroup = datastream.controlGroup();
         switch (controlGroup) {
-
             case MANAGED:
                 final Blob blob = dsStoreConnection.getBlob(contentLocation, null);
                 return blob.openInputStream();

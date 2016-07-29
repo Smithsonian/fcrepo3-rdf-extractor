@@ -9,11 +9,17 @@ import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWrapper;
 import org.apache.jena.sparql.core.Quad;
 
-public class GraphStreamRDF extends StreamRDFWrapper {
+/**
+ * Wraps another {@link StreamRDF}, sending all tuples to the same graph.
+ *
+ * @author A. Soroka
+ *
+ */
+public class SingleGraphStreamRDF extends StreamRDFWrapper {
 
     private final Node graphName;
 
-    public GraphStreamRDF(final Node graph, final StreamRDF sink) {
+    public SingleGraphStreamRDF(final Node graph, final StreamRDF sink) {
         super(sink);
         this.graphName = graph;
     }
@@ -25,6 +31,7 @@ public class GraphStreamRDF extends StreamRDFWrapper {
 
     @Override
     public void quad(final Quad quad) {
-        sink.quad(create(graphName, quad.asTriple()));
+        if (quad.getGraph().equals(graphName)) sink.quad(quad);
+        else sink.quad(create(graphName, quad.asTriple()));
     }
 }
