@@ -125,8 +125,11 @@ public class Extract implements Runnable {
         extractor.run();
     }
 
+    /**
+     * Must be called before {@link #run()}!
+     */
     public void init() {
-
+        // configure logging
         if (logConfig != null) {
             final LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
             context.reset();
