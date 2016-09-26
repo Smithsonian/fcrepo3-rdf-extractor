@@ -26,12 +26,12 @@ public class SingleGraphStreamRDF extends StreamRDFWrapper {
 
     @Override
     public void triple(final Triple triple) {
-        sink.quad(create(graphName, triple));
+        other.quad(create(graphName, triple));
     }
 
     @Override
     public void quad(final Quad quad) {
-        if (quad.getGraph().equals(graphName)) sink.quad(quad);
-        else sink.quad(create(graphName, quad.asTriple()));
+        if (quad.getGraph().equals(graphName)) other.quad(quad);
+        else other.quad(create(graphName, quad.asTriple()));
     }
 }

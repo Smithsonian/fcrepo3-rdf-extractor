@@ -26,6 +26,8 @@ public class ObjectProcessorTest {
 
     private final BlobStore objectStore = new MemBlobStore();
 
+    @SuppressWarnings("unused")
+    // TODO engage dsStore for this test
     private final BlobStore dsStore = new MemBlobStore();
 
     @Test

@@ -81,7 +81,7 @@ public class QueueingTripleStreamRDF extends StreamRDFWrapper implements BulkStr
     }
 
     private void sink(final Triple t) {
-        sink.triple(t);
+        other.triple(t);
         log.debug("Unqueued triple: {}", t);
     }
 
