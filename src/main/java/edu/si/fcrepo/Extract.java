@@ -13,7 +13,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOError;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -27,6 +26,7 @@ import java.util.stream.Stream;
 
 import org.akubraproject.BlobStore;
 import org.akubraproject.BlobStoreConnection;
+import org.apache.jena.atlas.RuntimeIOException;
 import org.apache.jena.atlas.io.IO;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
@@ -80,7 +80,6 @@ public class Extract implements Runnable {
     @Once
     public int numSinkingThreads = 1;
 
-
     @Option(name = {"-q", "--queueSize"}, title = "QueueSize",
                     description = "The number of tuples to queue into bulk loading (defaults to a megatuple)",
                     arity = 1)
@@ -108,8 +107,7 @@ public class Extract implements Runnable {
     public String logConfig = null;
 
     @Option(name = {"-i", "--countInterval"}, title = "CountInterval",
-                    description = "The number of URIs to process before logging a count (defaults to 1000)",
-                    arity = 1)
+                    description = "The number of URIs to process before logging a count (defaults to 1000)", arity = 1)
     @Once
     public int countInterval = 1000;
 
@@ -168,7 +166,7 @@ public class Extract implements Runnable {
         else try {
             bitSink = new FileOutputStream(outputFile, append);
         } catch (final FileNotFoundException e) {
-            throw new IOError(e);
+            throw new RuntimeIOException(e);
         }
         log.info(append
                         ? "Appending" : "Extracting" + " to {}...", outputFile);
@@ -187,21 +185,26 @@ public class Extract implements Runnable {
             final BlobStore objectStore = getBlobStore("objectStore");
             objectStoreConnection = objectStore.openConnection(null, null);
         } catch (final IOException e) {
-            throw new IOError(e);
+            throw new RuntimeIOException(e);
         }
-        final SynchronizedWriterStreamRDFPlain syncedTripleSink = new SynchronizedWriterStreamRDFPlain(IO.wrapUTF8(bitSink));
-        final SingleGraphStreamRDF graphWrappingTripleSink = new SingleGraphStreamRDF(createURI(graphName), syncedTripleSink);
-        final BulkStreamRDF queuingTripleSink = new QueueingTripleStreamRDF(graphWrappingTripleSink , numSinkingThreads, queueSize);
+        final SynchronizedWriterStreamRDFPlain syncedTripleSink =
+                        new SynchronizedWriterStreamRDFPlain(IO.wrapUTF8(bitSink));
+        final SingleGraphStreamRDF graphWrappingTripleSink =
+                        new SingleGraphStreamRDF(createURI(graphName), syncedTripleSink);
+        final BulkStreamRDF queuingTripleSink =
+                        new QueueingTripleStreamRDF(graphWrappingTripleSink, numSinkingThreads, queueSize);
         tripleSink = skipEmptyLiterals
                         ? new SkipEmptyLiteralsStreamRDF(queuingTripleSink) : queuingTripleSink;
         objectProcessor = new ObjectProcessor(objectStoreConnection, dsStoreConnection, tripleSink);
 
         try {
-            final Iterator<URI> objectIdIterator = uris == null
-                            ? objectStoreConnection.listBlobIds(null) : uris.iterator();
-            objectBlobUris = stream(spliteratorUnknownSize(objectIdIterator, 0), true).collect(toList()).stream();
+            if (uris == null) {
+                final Iterator<URI> objectIdIterator = objectStoreConnection.listBlobIds(null);
+                // collect the URIs before streaming to ensure effective parallelization
+                objectBlobUris = stream(spliteratorUnknownSize(objectIdIterator, 0), false).collect(toList()).stream();
+            } else objectBlobUris = uris.stream();
         } catch (final IOException e) {
-            throw new IOError(e);
+            throw new RuntimeIOException(e);
         }
     }
 
@@ -213,8 +216,8 @@ public class Extract implements Runnable {
     public void run() {
         log.info("Beginning extraction.");
         tripleSink.startBulk();
-        final ForkJoinTask<Extract> execution = extractionThreads.submit(() -> objectBlobUris.peek(this::count).parallel().forEach(objectProcessor), this);
-
+        final ForkJoinTask<Extract> execution = extractionThreads
+                        .submit(() -> objectBlobUris.peek(this::count).parallel().forEach(objectProcessor), this);
         try {
             try {
                 execution.get();
