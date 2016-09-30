@@ -5,6 +5,7 @@ import static com.github.rvesse.airline.SingleCommand.singleCommand;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.out;
 import static java.util.Spliterators.spliteratorUnknownSize;
+import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
@@ -224,6 +225,7 @@ public class Extract implements Runnable {
             } catch (@SuppressWarnings("unused") final ExecutionException e) {
                 log.error("Error while extracting!", execution.getException());
             }
+            extractionThreads.awaitQuiescence(3, DAYS);
             extractionThreads.shutdown();
             extractionThreads.awaitTermination(3, MINUTES);
             tripleSink.finishBulk();
