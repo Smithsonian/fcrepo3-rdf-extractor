@@ -66,11 +66,18 @@ public class Extract implements Runnable {
     @Once
     public String graphName = "#ri";
 
-    @Option(name = {"-n", "--numThreads"}, title = "NumberOfThreads",
-                    description = "The number of threads to use in parallel (defaults to the # of available processors)",
+    @Option(name = {"-n", "--numExtractorThreads"}, title = "NumberOfExtractorThreads",
+                    description = "The number of threads to use in parallel for RDF extraction (defaults to the # of available processors)",
                     arity = 1)
     @Once
-    public int numThreads = getRuntime().availableProcessors();
+    public int numExtractorThreads = getRuntime().availableProcessors();
+
+    @Option(name = {"-s", "--numSinkingThreads"}, title = "NumberOfSinkingThreads",
+                    description = "The number of threads to use in parallel for RDF serialization (defaults to 1)",
+                    arity = 1)
+    @Once
+    public int numSinkingThreads = 1;
+
 
     @Option(name = {"-q", "--queueSize"}, title = "QueueSize",
                     description = "The number of tuples to queue into bulk loading (defaults to a megatuple)",
@@ -142,8 +149,8 @@ public class Extract implements Runnable {
             }
         }
 
-        extractionThreads = new ForkJoinPool(numThreads);
-        log.info("Using {} threads for extraction and a queue size of {}.", numThreads, queueSize);
+        extractionThreads = new ForkJoinPool(numExtractorThreads);
+        log.info("Using {} threads for extraction and a queue size of {}.", numExtractorThreads, queueSize);
         if (outputFile == null) bitSink = out;
         else try {
             bitSink = new FileOutputStream(outputFile, append);
@@ -171,7 +178,7 @@ public class Extract implements Runnable {
         }
         final SynchronizedWriterStreamRDFPlain syncedTripleSink = new SynchronizedWriterStreamRDFPlain(IO.wrapUTF8(bitSink));
         final SingleGraphStreamRDF graphWrappingTripleSink = new SingleGraphStreamRDF(createURI(graphName), syncedTripleSink);
-        tripleSink = new QueueingTripleStreamRDF(graphWrappingTripleSink, numThreads, queueSize);
+        tripleSink = new QueueingTripleStreamRDF(graphWrappingTripleSink, numSinkingThreads, queueSize);
         objectProcessor = new ObjectProcessor(objectStoreConnection, dsStoreConnection, tripleSink);
 
         try {
