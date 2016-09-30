@@ -73,8 +73,8 @@ public class QueueingTripleStreamRDF extends StreamRDFWrapper implements BulkStr
         synchronized (this) {
             if (!started) {
                 final int numThreads = unqueueingThreads().getCorePoolSize();
-                log.info("Starting {} unqueueing threads.", numThreads);
-                range(1, numThreads).forEachOrdered(buildLoader);
+                log.info("Starting {} unqueueing thread(s).", numThreads);
+                range(1, numThreads + 1).forEachOrdered(buildLoader);
                 started = true;
             }
         }
