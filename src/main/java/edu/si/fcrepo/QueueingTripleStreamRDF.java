@@ -54,14 +54,14 @@ public class QueueingTripleStreamRDF extends StreamRDFWrapper implements BulkStr
             log.debug("{} starting unqueueing…", threadName);
             try {
                 while (continueUnqueueing) {
-                    log.debug("Waiting for triple…");
+                    if (queue().isEmpty()) log.debug("Waiting for triple…");
                     final Triple t = queue().poll(2, SECONDS);
                     if (t != null) {
-                        log.debug("Unqueued: {}, leaving {} queued.", t, queue().size());
+                        log.debug("Unqueued one triple, leaving {} queued.", queue().size());
                         sink(t);
                     }
                 }
-                log.debug("{} stopped unqueue.", threadName);
+                log.debug("{} stopped unqueueing.", threadName);
             } catch (final InterruptedException e) {
                 log.warn(threadName + " was interrupted!", e);
             }

@@ -5,7 +5,7 @@ import static com.github.rvesse.airline.SingleCommand.singleCommand;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.out;
 import static java.util.Spliterators.spliteratorUnknownSize;
-import static java.util.concurrent.TimeUnit.DAYS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -19,7 +19,9 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -90,6 +92,11 @@ public class Extract implements Runnable {
     @Once
     public String outputFile;
 
+    @Option(name = {"--skipEmptyLiterals"}, title = "SkipEmptyLiterals",
+                    description = "Whether to skip triples with a literal object that is an emoty string (defaults to false)")
+    @Once
+    public boolean skipEmptyLiterals = false;
+
     @Option(name = {"--append"}, title = "Append",
                     description = "Whether to append to the output file (defaults to false)")
     @Once
@@ -99,6 +106,12 @@ public class Extract implements Runnable {
                     description = "The location of an optional logback.xml configuration file")
     @Once
     public String logConfig = null;
+
+    @Option(name = {"-i", "--countInterval"}, title = "CountInterval",
+                    description = "The number of URIs to process before logging a count (defaults to 1000)",
+                    arity = 1)
+    @Once
+    public int countInterval = 1000;
 
     @Arguments(description = "URIs to process (default is to process all contents)")
     public List<URI> uris;
@@ -178,7 +191,9 @@ public class Extract implements Runnable {
         }
         final SynchronizedWriterStreamRDFPlain syncedTripleSink = new SynchronizedWriterStreamRDFPlain(IO.wrapUTF8(bitSink));
         final SingleGraphStreamRDF graphWrappingTripleSink = new SingleGraphStreamRDF(createURI(graphName), syncedTripleSink);
-        tripleSink = new QueueingTripleStreamRDF(graphWrappingTripleSink, numSinkingThreads, queueSize);
+        final BulkStreamRDF queuingTripleSink = new QueueingTripleStreamRDF(graphWrappingTripleSink , numSinkingThreads, queueSize);
+        tripleSink = skipEmptyLiterals
+                        ? new SkipEmptyLiteralsStreamRDF(queuingTripleSink) : queuingTripleSink;
         objectProcessor = new ObjectProcessor(objectStoreConnection, dsStoreConnection, tripleSink);
 
         try {
@@ -190,25 +205,31 @@ public class Extract implements Runnable {
         }
     }
 
+    private void count(final URI u) {
+        if (++counter % countInterval == 0) log.info("Reached {} objects at URI {}.", counter, u);
+    }
+
     @Override
     public void run() {
         log.info("Beginning extraction.");
         tripleSink.startBulk();
-        extractionThreads.execute(() -> objectBlobUris.parallel().peek(uri -> {
-            if (counter++ % 1000 == 0) log.info("Reached {} objects.", counter);
-        }).forEach(objectProcessor));
-        extractionThreads.awaitQuiescence(3, DAYS);
+        final ForkJoinTask<Extract> execution = extractionThreads.submit(() -> objectBlobUris.peek(this::count).parallel().forEach(objectProcessor), this);
+
         try {
+            try {
+                execution.get();
+            } catch (@SuppressWarnings("unused") final ExecutionException e) {
+                log.error("Error while extracting!", execution.getException());
+            }
             tripleSink.finishBulk();
-            bitSink.close();
+            IO.flush(bitSink);
+            IO.close(bitSink);
             extractionThreads.shutdown();
-            extractionThreads.awaitTermination(3, DAYS);
+            extractionThreads.awaitTermination(3, MINUTES);
             dsStoreConnection.close();
             objectStoreConnection.close();
             ((Lifecycle) akubraContext).stop();
             log.info("Finished extraction.");
-        } catch (final IOException e) {
-            throw new IOError(e);
         } catch (@SuppressWarnings("unused") final InterruptedException e) {
             System.exit(1);
         }

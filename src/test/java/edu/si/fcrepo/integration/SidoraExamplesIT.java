@@ -45,6 +45,7 @@ public class SidoraExamplesIT {
             final String fileName = pid.replace(':', '-');
             testExtractor.outputFile = resultsDir + "/" + fileName + ".nq";
             log.debug("Using output file: {}", testExtractor.outputFile);
+            testExtractor.countInterval = 1;
             testExtractor.init();
             testExtractor.run();
             final Model answer = loadModel(uriForResource("answers/" + fileName + ".nt"), NTRIPLES);
