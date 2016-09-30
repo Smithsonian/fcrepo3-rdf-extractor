@@ -224,11 +224,11 @@ public class Extract implements Runnable {
             } catch (@SuppressWarnings("unused") final ExecutionException e) {
                 log.error("Error while extracting!", execution.getException());
             }
+            extractionThreads.shutdown();
+            extractionThreads.awaitTermination(3, MINUTES);
             tripleSink.finishBulk();
             IO.flush(bitSink);
             IO.close(bitSink);
-            extractionThreads.shutdown();
-            extractionThreads.awaitTermination(3, MINUTES);
             dsStoreConnection.close();
             objectStoreConnection.close();
             ((Lifecycle) akubraContext).stop();

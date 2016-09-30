@@ -1,12 +1,15 @@
 
 package edu.si.fcrepo;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWrapper;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
+import org.slf4j.Logger;
 
 /**
  * Passes only tuples in which the object is anything other than an empty-string literal.
@@ -15,13 +18,18 @@ import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
  */
 public class SkipEmptyLiteralsStreamRDF extends StreamRDFWrapper implements BulkStreamRDF {
 
+    private static final Logger log = getLogger(SkipEmptyLiteralsStreamRDF.class);
+
     public SkipEmptyLiteralsStreamRDF(final StreamRDF other) {
         super(other);
     }
 
     @Override
     public void triple(final Triple triple) {
-        if (isNotEmptyLiteral(triple.getObject())) other.triple(triple);
+        if (isNotEmptyLiteral(triple.getObject())) {
+            log.debug("Passing {}", triple);
+            other.triple(triple);
+        } else log.debug("Blocking {}", triple);
     }
 
     @Override
