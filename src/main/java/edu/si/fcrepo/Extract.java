@@ -70,16 +70,16 @@ public class Extract implements Runnable {
     public String graphName = "#ri";
 
     @Option(name = {"-n", "--numExtractorThreads"}, title = "NumberOfExtractorThreads",
-                    description = "The number of threads to use in parallel for RDF extraction (defaults to the # of available processors)",
+                    description = "The number of threads to use in parallel for RDF extraction (defaults to the # of available processor cores)",
                     arity = 1)
     @Once
     public int numExtractorThreads = getRuntime().availableProcessors();
 
     @Option(name = {"-s", "--numSinkingThreads"}, title = "NumberOfSinkingThreads",
-                    description = "The number of threads to use in parallel for RDF serialization (defaults to 1)",
+                    description = "The number of threads to use in parallel for RDF serialization (defaults to the # of available processor cores)",
                     arity = 1)
     @Once
-    public int numSinkingThreads = 1;
+    public int numSinkingThreads = getRuntime().availableProcessors();
 
     @Option(name = {"-q", "--queueSize"}, title = "QueueSize",
                     description = "The number of tuples to queue into bulk loading (defaults to a megatuple)",
