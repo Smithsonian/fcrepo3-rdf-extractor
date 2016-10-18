@@ -129,7 +129,7 @@ public class ObjectProcessor implements Consumer<URI> {
         } catch (final IOException e) {
             log.error("Error reading from object: " + objectId, e);
         } catch (final Exception e) {
-            log.error("Error doing extraction for object: " + objectId, e);
+            log.error("Error extracting from object: " + objectId, e);
             log.error("Only some triples were extracted for {}!", objectId);
         }
     }

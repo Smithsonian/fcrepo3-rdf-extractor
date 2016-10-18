@@ -27,9 +27,9 @@ public class SkipEmptyLiteralsStreamRDF extends StreamRDFWrapper implements Bulk
     @Override
     public void triple(final Triple triple) {
         if (isNotEmptyLiteral(triple.getObject())) {
-            log.debug("Passing {}", triple);
+            log.trace("Passing {}", triple);
             other.triple(triple);
-        } else log.debug("Blocking {}", triple);
+        } else log.trace("Blocking {}", triple);
     }
 
     @Override

@@ -45,6 +45,7 @@ import com.github.rvesse.airline.annotations.restrictions.Required;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.LogbackException;
 import ch.qos.logback.core.joran.spi.JoranException;
 
 @Command(name = "extract", description = "Extractor from Akubra to Quads")
@@ -93,7 +94,7 @@ public class Extract implements Runnable {
     public String outputFile;
 
     @Option(name = {"--skipEmptyLiterals"}, title = "SkipEmptyLiterals",
-                    description = "Whether to skip triples with a literal object that is an emoty string (defaults to false)")
+                    description = "Whether to skip triples with an empty string literal in the object position (defaults to false)")
     @Once
     public boolean skipEmptyLiterals = false;
 
@@ -157,7 +158,7 @@ public class Extract implements Runnable {
             try {
                 configurator.doConfigure(logConfig);
             } catch (final JoranException e) {
-                throw new RuntimeException(e);
+                throw new LogbackException("Error with logging configuration!", e);
             }
         }
 
@@ -169,14 +170,14 @@ public class Extract implements Runnable {
         } catch (final FileNotFoundException e) {
             throw new RuntimeIOException(e);
         }
-        log.info(append
-                        ? "Appending" : "Extracting" + " to {}...", outputFile);
+        log.info(append ? "Appending"
+                        : "Extracting" + " to {}...", outputFile);
 
         // Akubra setup
         if (akubraContext == null) {
             log.info("with Akubra configuration from {}.", akubra);
-            akubra = akubra.startsWith("/")
-                            ? "file:" + akubra : akubra;
+            akubra = akubra.startsWith("/") ? "file:" + akubra
+                                            : akubra;
             akubraContext = new FileSystemXmlApplicationContext(akubra);
         }
 
@@ -194,8 +195,8 @@ public class Extract implements Runnable {
                         new SingleGraphStreamRDF(createURI(graphName), syncedTripleSink);
         final BulkStreamRDF queuingTripleSink =
                         new QueueingTripleStreamRDF(graphWrappingTripleSink, numSinkingThreads, queueSize);
-        tripleSink = skipEmptyLiterals
-                        ? new SkipEmptyLiteralsStreamRDF(queuingTripleSink) : queuingTripleSink;
+        tripleSink = skipEmptyLiterals ? new SkipEmptyLiteralsStreamRDF(queuingTripleSink)
+                                       : queuingTripleSink;
         objectProcessor = new ObjectProcessor(objectStoreConnection, dsStoreConnection, tripleSink);
 
         try {
