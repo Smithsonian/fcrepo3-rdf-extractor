@@ -29,7 +29,7 @@ import org.akubraproject.BlobStore;
 import org.akubraproject.BlobStoreConnection;
 import org.apache.jena.atlas.RuntimeIOException;
 import org.apache.jena.atlas.io.IO;
-import org.apache.jena.tdb.TDB;
+import org.apache.jena.system.JenaSystem;
 import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +40,10 @@ import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.restrictions.NotBlank;
 import com.github.rvesse.airline.annotations.restrictions.Once;
 import com.github.rvesse.airline.annotations.restrictions.Required;
+import com.github.rvesse.airline.annotations.restrictions.ranges.IntegerRange;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -51,46 +53,54 @@ import ch.qos.logback.core.joran.spi.JoranException;
 @Command(name = "extract", description = "Extractor from Akubra to Quads")
 public class Extract implements Runnable {
 
+    private static final int KILO = 1024;
+
     private static final int MEGA = 1 << 20;
 
     private static final Logger log = getLogger(Extract.class);
 
     static {
-        TDB.init();
+        JenaSystem.init();
     }
 
     @Option(name = {"-a", "--akubra"}, title = "Akubra", description = "The Akubra context file from which to read",
                     arity = 1)
     @Required
     @Once
+    @NotBlank
     public String akubra;
 
     @Option(name = {"-g", "--graph"}, title = "GraphName",
                     description = "The named graph into which to write (defaults to <#ri>)", arity = 1)
     @Once
+    @NotBlank
     public String graphName = "#ri";
 
     @Option(name = {"-n", "--numExtractorThreads"}, title = "NumberOfExtractorThreads",
                     description = "The number of threads to use in parallel for RDF extraction (defaults to the # of available processor cores)",
                     arity = 1)
     @Once
+    @IntegerRange(min = 1)
     public int numExtractorThreads = getRuntime().availableProcessors();
 
     @Option(name = {"-s", "--numSinkingThreads"}, title = "NumberOfSinkingThreads",
                     description = "The number of threads to use in parallel for RDF serialization (defaults to the # of available processor cores)",
                     arity = 1)
     @Once
+    @IntegerRange(min = 1)
     public int numSinkingThreads = getRuntime().availableProcessors();
 
     @Option(name = {"-q", "--queueSize"}, title = "QueueSize",
-                    description = "The number of tuples to queue into bulk loading (defaults to a megatuple)",
+                    description = "The number of tuples to queue into bulk loading (defaults to " + MEGA + ")",
                     arity = 1)
     @Once
+    @IntegerRange(min = 0)
     public int queueSize = MEGA; // default is a megatuple
 
     @Option(name = {"-o", "--outputFile"}, title = "OutputFile",
                     description = "The output file into which to extract triples", arity = 1)
     @Once
+    @NotBlank
     public String outputFile;
 
     @Option(name = {"--skipEmptyLiterals"}, title = "SkipEmptyLiterals",
@@ -106,12 +116,15 @@ public class Extract implements Runnable {
     @Option(name = {"--logback"}, title = "LogbackConfig",
                     description = "The location of an optional logback.xml configuration file")
     @Once
+    @NotBlank
     public String logConfig = null;
 
     @Option(name = {"-i", "--countInterval"}, title = "CountInterval",
-                    description = "The number of URIs to process before logging a count (defaults to 1000)", arity = 1)
+                    description = "The number of URIs to process before logging a count (defaults to " + KILO + ")",
+                    arity = 1)
     @Once
-    public int countInterval = 1000;
+    @IntegerRange(min = 1)
+    public int countInterval = KILO;
 
     @Arguments(description = "URIs to process (default is to process all contents)")
     public List<URI> uris;

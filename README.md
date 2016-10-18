@@ -24,7 +24,7 @@ where options include:
 -q, --queueSize: The maximum number of tuples to queue into serialization before blocking (defaults to a megatuple)
 --append: Whether to append to the output file (defaults to false)
 --skipEmptyLiterals: Whether to skip triples with an empty string literal in the object position (defaults to false)
--i, --countInterval: The number of URIs to process before logging a count (defaults to 1000)
+-i, --countInterval: The number of URIs to process before logging a count (defaults to 1024)
 --logback: The location of an optional logback.xml configuration file
 ```
 Any further (positional) arguments are understood as selecting particular object URIs to process, for example for testing purposes. The default is to process all contents in the `BlobStore` bean named `objectStore` in the selected Akubra configuration.
