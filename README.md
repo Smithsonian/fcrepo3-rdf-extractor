@@ -27,6 +27,6 @@ where options include:
 -i, --countInterval: The number of URIs to process before logging a count (defaults to 1000)
 --logback: The location of an optional logback.xml configuration file
 ```
-Any further arguments are understood as selecting particular object URIs to process, for example for testing purposes. The default is to process all contents in the `BlobStore` bean named `objectStore` in the selected Akubra configuration.
+Any further (positional) arguments are understood as selecting particular object URIs to process, for example for testing purposes. The default is to process all contents in the `BlobStore` bean named `objectStore` in the selected Akubra configuration.
 
 This utility fully streams processing so should not require a large heap allocation. 
