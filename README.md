@@ -19,9 +19,12 @@ where options include:
 #### OPTIONAL
 ```
 -g, --graph: The named graph into which to serialize (defaults to <#ri>)
--n, --numThreads: The number of threads to use in parallel for extraction and for serialization (defaults to the number of available processors),
--q, --queueSize: The number of tuples to queue into serialization (defaults to a megatuple)
+-n, --numExtractorThreads: Threads to use in parallel for extraction (defaults to the # of available processor cores)
+-s, --numSinkingThreads: Threads to use in parallel for serialization (defaults to the # of available processor cores)
+-q, --queueSize: The maximum number of tuples to queue into serialization before blocking (defaults to a megatuple)
 --append: Whether to append to the output file (defaults to false)
+--skipEmptyLiterals: Whether to skip triples with an empty string literal in the object position (defaults to false)
+-i, --countInterval: The number of URIs to process before logging a count (defaults to 1000)
 --logback: The location of an optional logback.xml configuration file
 ```
 Any further arguments are understood as selecting particular object URIs to process, for example for testing purposes. The default is to process all contents in the `BlobStore` bean named `objectStore` in the selected Akubra configuration.
