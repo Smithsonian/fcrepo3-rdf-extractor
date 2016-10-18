@@ -14,10 +14,10 @@ where options include:
 #### REQUIRED
 ```
 -a, --akubra: The Akubra configuration Spring XML file from which to read
--o, --outputFile: The output file into which to extract triples, which will contain standard N-Quads
 ```
 #### OPTIONAL
 ```
+-o, --outputFile: The output file into which to extract triples, which will contain standard N-Quads (defaults to STDOUT)
 -g, --graph: The named graph into which to serialize (defaults to <#ri>)
 -n, --numExtractorThreads: Threads to use in parallel for extraction (defaults to the # of available processor cores)
 -s, --numSinkingThreads: Threads to use in parallel for serialization (defaults to the # of available processor cores)
