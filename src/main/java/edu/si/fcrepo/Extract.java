@@ -4,7 +4,6 @@ package edu.si.fcrepo;
 import static com.github.rvesse.airline.SingleCommand.singleCommand;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.out;
-import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.stream.Collectors.toList;
@@ -36,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.Lifecycle;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+
 import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -215,8 +215,7 @@ public class Extract implements Runnable {
         try {
             if (uris == null) {
                 final Iterator<URI> objectIdIterator = objectStoreConnection.listBlobIds(null);
-                // collect the URIs before streaming to ensure effective parallelization
-                objectBlobUris = stream(spliteratorUnknownSize(objectIdIterator, 0), false).collect(toList()).stream();
+                objectBlobUris = stream(new ShufflingSpliterator<>(objectIdIterator), false).collect(toList()).stream();
             } else objectBlobUris = uris.stream();
         } catch (final IOException e) {
             throw new RuntimeIOException(e);
