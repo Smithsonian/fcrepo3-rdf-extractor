@@ -2,6 +2,8 @@
 
 This is a simple, performant tool for extracting RDF from FOXML and RDF/XML datastreams stored in Akubra systems.
 
+If you are using this tool with an Akubra Spring XML configuration file from a Fedora instance, you will want to add the attribute `default-lazy-init="true"` to the top-level `beans` element. This will not affect the operation of your Fedora repository at all, but it will prevent this tool from trying to instantiate those beans declared in the XML file that use Fedora-specific Java classes, which would cause it to crash.
+
 To build (requires Java 8), `git clone` and:
 ```
 cd fcrepo3-rdf-extractor ; mvn clean package
