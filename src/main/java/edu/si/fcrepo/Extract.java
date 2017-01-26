@@ -215,7 +215,7 @@ public class Extract implements Runnable {
         try {
             if (uris == null) {
                 final Iterator<URI> objectIdIterator = objectStoreConnection.listBlobIds(null);
-                objectBlobUris = stream(new ShufflingSpliterator<>(objectIdIterator), false).collect(toList()).stream();
+                objectBlobUris = stream(new ShufflingSpliterator<>(objectIdIterator), true);
             } else objectBlobUris = uris.stream();
         } catch (final IOException e) {
             throw new RuntimeIOException(e);
