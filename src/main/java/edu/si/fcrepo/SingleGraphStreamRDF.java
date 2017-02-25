@@ -8,6 +8,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWrapper;
 import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
 
 /**
  * Wraps another {@link StreamRDF}, sending all tuples to the same graph.
@@ -15,7 +16,7 @@ import org.apache.jena.sparql.core.Quad;
  * @author A. Soroka
  *
  */
-public class SingleGraphStreamRDF extends StreamRDFWrapper {
+public class SingleGraphStreamRDF extends StreamRDFWrapper implements BulkStreamRDF {
 
     private final Node graphName;
 
@@ -33,5 +34,13 @@ public class SingleGraphStreamRDF extends StreamRDFWrapper {
     public void quad(final Quad quad) {
         if (quad.getGraph().equals(graphName)) other.quad(quad);
         else other.quad(create(graphName, quad.asTriple()));
+    }
+
+    @Override
+    public void finishBulk() {
+    }
+
+    @Override
+    public void startBulk() {  
     }
 }
