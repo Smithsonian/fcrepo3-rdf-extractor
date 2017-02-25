@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -144,6 +145,8 @@ public class Extract implements Runnable {
     
     private volatile int counter = 0;
 
+    private ArrayBlockingQueue<Runnable> queue;
+
     public static void main(final String[] args) {
         final SingleCommand<Extract> cliParser = singleCommand(Extract.class);
         final Extract extractor = cliParser.parse(args);
@@ -168,8 +171,8 @@ public class Extract implements Runnable {
             }
         }
 
-        extractionThreads = new ThreadPoolExecutor(numExtractorThreads, numExtractorThreads, MAX_VALUE, DAYS,
-                        newArrayBlockingQueue(queueSize));
+        queue = newArrayBlockingQueue(queueSize);
+        extractionThreads = new ThreadPoolExecutor(numExtractorThreads, numExtractorThreads, MAX_VALUE, DAYS, queue);
         log.info("Using {} threads for extraction and a queue size of {}.", numExtractorThreads, queueSize);
 
         File outputLocationFile = new File(outputLocation);
@@ -206,7 +209,8 @@ public class Extract implements Runnable {
     }
 
     private int count(final URI u) {
-        if (++counter % countInterval == 0) log.info("Reached {} objects at URI {}.", counter, u);
+        if (++counter % countInterval == 0)
+            log.info("Reached {} objects at URI {} with {} in-queue.", counter, u, queue.size());
         return counter;
     }
 
