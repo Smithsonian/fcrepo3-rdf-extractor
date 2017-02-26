@@ -1,13 +1,17 @@
 
 package edu.si.fcrepo.integration.classpath;
 
+import static edu.si.fcrepo.Extract.UnsafeIO.unsafeIO;
+import static java.util.Arrays.stream;
+
+import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.akubraproject.Blob;
 import org.akubraproject.impl.AbstractBlobStoreConnection;
-import org.reflections.Reflections;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 public class ClasspathBlobStoreConnection extends AbstractBlobStoreConnection {
 
@@ -24,9 +28,9 @@ public class ClasspathBlobStoreConnection extends AbstractBlobStoreConnection {
     }
 
     @Override
-    public Iterator<URI> listBlobIds(final String filterPrefix) {
-        final Reflections reflections = new Reflections(location);
-        return reflections.getResources(x -> true).stream().map(URI::create).iterator();
+    public Iterator<URI> listBlobIds(final String filterPrefix) throws IOException {
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        return stream(resolver.getResources(location)).map(u -> unsafeIO(() -> u.getURI())).iterator();
     }
 
     @Override

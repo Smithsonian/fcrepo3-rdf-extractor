@@ -2,6 +2,7 @@
 package edu.si.fcrepo;
 
 import static com.github.rvesse.airline.SingleCommand.singleCommand;
+import static com.github.rvesse.airline.help.Help.help;
 import static com.google.common.collect.Queues.newArrayBlockingQueue;
 import static edu.si.fcrepo.Extract.UnsafeIO.unsafeIO;
 import static java.lang.Long.MAX_VALUE;
@@ -27,6 +28,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
+import javax.inject.Inject;
+
 import org.akubraproject.BlobStore;
 import org.akubraproject.BlobStoreConnection;
 import org.apache.jena.atlas.RuntimeIOException;
@@ -41,6 +44,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.Lifecycle;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import com.github.rvesse.airline.HelpOption;
 import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -49,13 +53,15 @@ import com.github.rvesse.airline.annotations.restrictions.NotBlank;
 import com.github.rvesse.airline.annotations.restrictions.Once;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import com.github.rvesse.airline.annotations.restrictions.ranges.IntegerRange;
+import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
+import com.google.common.base.Strings;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.LogbackException;
 import ch.qos.logback.core.joran.spi.JoranException;
 
-@Command(name = "extract", description = "Extractor from Akubra to Quads")
+@Command(name = "extract", description = "Extract RDF from Fedora/Akubra to NQuads")
 public class Extract implements Runnable {
 
     private static final int KILO = 1 << 10;
@@ -67,6 +73,9 @@ public class Extract implements Runnable {
     static {
         JenaSystem.init();
     }
+
+    @Inject
+    public HelpOption<Extract> helpOption;
 
     @Option(name = { "-a",
                     "--akubra" }, title = "Akubra", description = "The Akubra context file from which to read", arity = 1)
@@ -138,16 +147,24 @@ public class Extract implements Runnable {
     private Consumer<URI>[] objectProcessors;
 
     private List<Writer> bitSinks;
-    
+
     private volatile int count = 0;
 
     private ArrayBlockingQueue<Runnable> queue;
 
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws IOException {
         final SingleCommand<Extract> cliParser = singleCommand(Extract.class);
-        final Extract extractor = cliParser.parse(args);
-        extractor.init();
-        extractor.run();
+        try {
+            final Extract extractor = cliParser.parse(args);
+            extractor.init();
+            extractor.run();
+        } catch (ParseOptionMissingException e) {
+            String starLine = "\n"+ Strings.padEnd("*", 80, '*') +"\n";
+            String errorBlock = starLine + e.getLocalizedMessage() + starLine;
+            System.err.println(errorBlock);
+            help(cliParser.getCommandMetadata());
+            System.err.println(errorBlock);
+        }
     }
 
     /**
@@ -187,10 +204,10 @@ public class Extract implements Runnable {
         dsStoreConn = unsafeIO(() -> dsStore.openConnection(null, null));
         final BlobStore objectStore = getBlobStore("objectStore");
         objectStoreConn = unsafeIO(() -> objectStore.openConnection(null, null));
-        
+
         objectProcessors = new ObjectProcessor[numExtractorThreads];
         bitSinks = new ArrayList<>(numExtractorThreads);
-        
+
         for (int i = 0; i < numExtractorThreads; i++) {
             Path outputFile = Paths.get(outputLocation, "quads" + i + ".nq").toAbsolutePath();
             final BufferedWriter writer = unsafeIO(() -> newBufferedWriter(outputFile));
@@ -213,8 +230,8 @@ public class Extract implements Runnable {
     public void run() {
         log.info("Beginning extraction.");
         tripleSink.startBulk();
-        objectBlobUris.forEachRemaining(objectId ->
-            extractionThreads.submit(() -> objectProcessors[count(objectId) % numExtractorThreads].accept(objectId)));
+        objectBlobUris.forEachRemaining(objectId -> extractionThreads
+                        .submit(() -> objectProcessors[count(objectId) % numExtractorThreads].accept(objectId)));
         // shutdown
         try {
             extractionThreads.shutdown();
@@ -235,7 +252,7 @@ public class Extract implements Runnable {
      * IOException => RuntimeIOException
      */
     @FunctionalInterface
-    interface UnsafeIO<T>  {
+    public interface UnsafeIO<T> {
 
         T call() throws IOException;
 
