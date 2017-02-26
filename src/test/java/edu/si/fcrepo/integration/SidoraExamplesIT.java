@@ -1,8 +1,7 @@
 
 package edu.si.fcrepo.integration;
 
-import static edu.si.fcrepo.TestHelpers.ntriples;
-import static edu.si.fcrepo.TestHelpers.uriForResource;
+import static java.lang.Thread.currentThread;
 import static java.nio.file.Files.createTempDirectory;
 import static java.nio.file.Files.newDirectoryStream;
 import static java.util.Arrays.asList;
@@ -11,10 +10,12 @@ import static java.util.UUID.randomUUID;
 import static org.apache.jena.riot.Lang.NQUADS;
 import static org.apache.jena.riot.Lang.NTRIPLES;
 import static org.apache.jena.riot.RDFDataMgr.loadModel;
+import static org.apache.jena.riot.RDFDataMgr.read;
 import static org.junit.Assert.assertTrue;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Path;
@@ -25,7 +26,6 @@ import org.apache.jena.atlas.RuntimeIOException;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.RDFDataMgr;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -34,8 +34,8 @@ import edu.si.fcrepo.Extract;
 
 public class SidoraExamplesIT {
 
-    private static final List<String> PIDS =
-                    asList("ct:85", "ct:86", "ct:88", "ct:90", "si-user:10", "si:1020", "si:1119");
+    private static final List<String> PIDS = asList("ct:85", "ct:86", "ct:88", "ct:90", "si-user:10", "si:1020",
+                    "si:1119");
 
     private static final Logger log = getLogger(SidoraExamplesIT.class);
 
@@ -53,18 +53,19 @@ public class SidoraExamplesIT {
             final String fileName = pid.replace(':', '-');
             testExtractor.outputLocation = resultsDir + "/" + fileName;
             log.debug("Using output location: {}", testExtractor.outputLocation);
-            testExtractor.countInterval = 1;
+            testExtractor.interval = 1;
             testExtractor.init();
             testExtractor.run();
             final Dataset allResults = DatasetFactory.create();
             final Model answer = loadModel(uriForResource("answers/" + fileName + ".nt"), NTRIPLES);
             try (DirectoryStream<Path> files = newDirectoryStream(Paths.get(testExtractor.outputLocation), "*.nq")) {
-                files.forEach(file -> RDFDataMgr.read(allResults, "file:" + file, NQUADS));
+                files.forEach(file -> read(allResults, "file:" + file, NQUADS));
             } catch (IOException e) {
                 throw new RuntimeIOException(e);
             }
 
             Model results = allResults.getNamedModel("#ri");
+
             final Model differences1 = results.difference(answer);
             if (!differences1.isEmpty())
                 log.error("Found {} differences:\n {}", differences1.size(), ntriples(differences1));
@@ -75,6 +76,19 @@ public class SidoraExamplesIT {
 
             assertTrue("Didn't get the correct answer for " + pid + "!", results.isIsomorphicWith(answer));
         });
-
+    }
+    
+    private static String uriForResource(final String name) {
+        log.debug("Retrieving resource: {}", name);
+        return currentThread().getContextClassLoader().getResource(name).toString();
+    }
+    
+    private static String ntriples(final Model m) {
+        try (StringWriter w = new StringWriter()) {
+            m.write(w, "N-TRIPLE");
+            return w.toString();
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

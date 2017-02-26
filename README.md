@@ -15,16 +15,14 @@ java -jar fcrepo3-rdf-extractor-0.0.1-SNAPSHOT.jar [OPTIONS]
 where options include:
 #### REQUIRED
 ```
--a, --akubra: The Akubra configuration Spring XML file from which to read
+-a, --akubra: The Akubra configuration Spring XML file to load. This utility will look for objects in a `BlobStore` bean named `objectStore` in the selected Akubra configuration and for datastreams in a `BlobStore` bean named `datastreamStore`.
 ```
 #### OPTIONAL
 ```
--o, --outputFile: The output file into which to extract triples, which will contain standard N-Quads (defaults to STDOUT)
+-o, --outputLocation: The directory into which to extract tuples, which will standard N-Quads files
 -g, --graph: The named graph into which to serialize (defaults to <#ri>)
 -n, --numExtractorThreads: Threads to use in parallel for extraction (defaults to the # of available processor cores)
--s, --numSinkingThreads: Threads to use in parallel for serialization (defaults to the # of available processor cores)
--q, --queueSize: The maximum number of tuples to queue into serialization before blocking (defaults to a megatuple)
---append: Whether to append to the output file (defaults to false)
+-s, --queueSize: The maximum number of objects to queue into extraction before blocking (defaults to a mega)
 --skipEmptyLiterals: Whether to skip triples with an empty string literal in the object position (defaults to false)
 -i, --countInterval: The number of URIs to process before logging a count (defaults to 1024)
 --logback: The location of an optional logback.xml configuration file
