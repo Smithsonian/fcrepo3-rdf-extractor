@@ -1,7 +1,6 @@
 
 package edu.si.fcrepo;
 
-import static edu.si.fcrepo.TestHelpers.loadResource;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.junit.Assert.assertTrue;
 
@@ -19,6 +18,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.lang.CollectorStreamRDF;
 import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 
 public class ObjectProcessorTest {
 
@@ -37,7 +37,7 @@ public class ObjectProcessorTest {
         // load some simple FOXML into our store
         final URI blobId = URI.create(OBJECT_URI);
         final Blob blob = conn.getBlob(blobId, null);
-        IOUtils.copy(loadResource("simple-foxml.xml"), blob.openOutputStream(0, true));
+        IOUtils.copy(new ClassPathResource("simple-foxml.xml").getInputStream(), blob.openOutputStream(0, true));
         final ObjectProcessor testProcessor = new ObjectProcessor(conn, null, tuples);
         // process the FOXML from that store
         testProcessor.accept(URI.create(OBJECT_URI));
@@ -48,7 +48,7 @@ public class ObjectProcessorTest {
         results.setNsPrefixes(tuples.getPrefixes().getMappingCopyStr());
         triples.forEach(t -> results.add(results.asStatement(t)));
         final Model rubric = createDefaultModel();
-        rubric.read(loadResource("simple.nt"), null, "N-TRIPLES");
+        rubric.read(new ClassPathResource("simple.nt").getInputStream(), null, "N-TRIPLES");
         assertTrue("Did not find expected triples!", results.isIsomorphicWith(rubric));
     }
 

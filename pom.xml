@@ -181,13 +181,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.reflections</groupId>
-      <artifactId>reflections</artifactId>
-      <version>0.9.10</version>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
   <build>
@@ -257,6 +250,11 @@
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.0.0</version>
         <configuration>
+          <artifactSet>
+            <excludes>
+              <exclude>commons-logging:commons-logging</exclude>
+            </excludes>
+          </artifactSet>
           <filters>
             <filter>
               <artifact>*:*</artifact>
@@ -276,10 +274,8 @@
             </goals>
             <configuration>
               <transformers>
-                <transformer
-                  implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                <transformer
-                  implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <mainClass>edu.si.fcrepo.Extract</mainClass>
                 </transformer>
               </transformers>

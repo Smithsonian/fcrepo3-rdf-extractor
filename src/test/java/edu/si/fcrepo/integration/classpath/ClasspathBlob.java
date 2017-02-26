@@ -3,6 +3,7 @@ package edu.si.fcrepo.integration.classpath;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
@@ -11,7 +12,7 @@ import java.util.Map;
 import org.akubraproject.Blob;
 import org.akubraproject.impl.AbstractBlob;
 import org.slf4j.Logger;
-import edu.si.fcrepo.TestHelpers;
+import org.springframework.core.io.ClassPathResource;
 
 public class ClasspathBlob extends AbstractBlob {
 
@@ -25,10 +26,10 @@ public class ClasspathBlob extends AbstractBlob {
     }
 
     @Override
-    public InputStream openInputStream() {
+    public InputStream openInputStream() throws IOException {
         final String resourceLocation = conn.location + "/" + getId();
         log.debug("Retrieving resource from: {}", resourceLocation);
-        return TestHelpers.loadResource(resourceLocation);
+        return new ClassPathResource(resourceLocation).getInputStream();
     }
 
     @Override
