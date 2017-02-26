@@ -74,9 +74,6 @@ public class Extract implements Runnable {
         JenaSystem.init();
     }
 
-    @Inject
-    public HelpOption<Extract> helpOption;
-
     @Option(name = { "-a",
                     "--akubra" }, title = "Akubra", description = "The Akubra context file from which to read", arity = 1)
     @Required
