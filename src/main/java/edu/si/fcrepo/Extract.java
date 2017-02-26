@@ -7,7 +7,6 @@ import static edu.si.fcrepo.Extract.UnsafeIO.unsafeIO;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Runtime.getRuntime;
 import static java.nio.file.Files.newBufferedWriter;
-import static java.util.concurrent.Executors.newWorkStealingPool;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static org.apache.jena.atlas.io.IO.wrap;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -24,10 +23,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.akubraproject.BlobStore;
@@ -52,7 +49,6 @@ import com.github.rvesse.airline.annotations.restrictions.NotBlank;
 import com.github.rvesse.airline.annotations.restrictions.Once;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import com.github.rvesse.airline.annotations.restrictions.ranges.IntegerRange;
-import com.google.common.collect.Queues;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -118,7 +114,7 @@ public class Extract implements Runnable {
                                     + KILO + ")", arity = 1)
     @Once
     @IntegerRange(min = 1)
-    public int countInterval = KILO;
+    public int interval = KILO;
 
     @Arguments(description = "URIs to process (default is to process all contents)")
     public List<URI> uris;
@@ -143,7 +139,7 @@ public class Extract implements Runnable {
 
     private List<Writer> bitSinks;
     
-    private volatile int counter = 0;
+    private volatile int count = 0;
 
     private ArrayBlockingQueue<Runnable> queue;
 
@@ -209,9 +205,8 @@ public class Extract implements Runnable {
     }
 
     private int count(final URI u) {
-        if (++counter % countInterval == 0)
-            log.info("Reached {} objects at URI {} with {} in-queue.", counter, u, queue.size());
-        return counter;
+        if (++count % interval == 0) log.info("Reached {} objects at {} with {} in-queue.", count, u, queue.size());
+        return count;
     }
 
     @Override
@@ -240,15 +235,17 @@ public class Extract implements Runnable {
      * IOException => RuntimeIOException
      */
     @FunctionalInterface
-    interface UnsafeIO<T> extends Callable<T> {
-        default T call() {
-            try { return unsafeRun(); }
-            catch (IOException e) { throw new RuntimeIOException(e); }
+    interface UnsafeIO<T>  {
+
+        T call() throws IOException;
+
+        static <U> U unsafeIO(UnsafeIO<U> u) {
+            try {
+                return u.call();
+            } catch (IOException e) {
+                throw new RuntimeIOException(e);
+            }
         }
-
-        T unsafeRun() throws IOException;
-
-        static <R> R unsafeIO(UnsafeIO<R> u) { return u.call(); }
     }
 
 }

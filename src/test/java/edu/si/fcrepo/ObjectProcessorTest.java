@@ -48,7 +48,7 @@ public class ObjectProcessorTest {
         results.setNsPrefixes(tuples.getPrefixes().getMappingCopyStr());
         triples.forEach(t -> results.add(results.asStatement(t)));
         final Model rubric = createDefaultModel();
-        rubric.read(TestHelpers.loadResource("simple.nt"), null, "N-TRIPLES");
+        rubric.read(loadResource("simple.nt"), null, "N-TRIPLES");
         assertTrue("Did not find expected triples!", results.isIsomorphicWith(rubric));
     }
 
