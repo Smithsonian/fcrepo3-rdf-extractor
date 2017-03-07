@@ -48,6 +48,7 @@ public class SkipEmptyLiteralsStreamRDF extends StreamRDFWrapper implements Bulk
 
     @Override
     public void finishBulk() {
+        other.finish();
         if (other instanceof BulkStreamRDF) ((BulkStreamRDF) other).finishBulk();
     }
 }
