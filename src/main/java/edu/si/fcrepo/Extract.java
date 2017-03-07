@@ -35,6 +35,7 @@ import org.akubraproject.BlobStoreConnection;
 import org.apache.jena.atlas.RuntimeIOException;
 import org.apache.jena.atlas.io.IO;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.writer.WriterStreamRDFPlain;
 import org.apache.jena.system.JenaSystem;
 import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
@@ -137,13 +138,12 @@ public class Extract implements Runnable {
 
     private ExecutorService extractionThreads;
 
-    private BulkStreamRDF tripleSink;
-
     private Iterator<URI> objectBlobUris;
 
     private Consumer<URI>[] objectProcessors;
 
     private List<Writer> bitSinks;
+    private List<BulkStreamRDF> tripleSinks;
 
     private volatile int count = 0;
 
@@ -204,15 +204,23 @@ public class Extract implements Runnable {
 
         objectProcessors = new ObjectProcessor[numExtractorThreads];
         bitSinks = new ArrayList<>(numExtractorThreads);
+        tripleSinks = new ArrayList<>(numExtractorThreads);
 
         for (int i = 0; i < numExtractorThreads; i++) {
             Path outputFile = Paths.get(outputLocation, "quads" + i + ".nq").toAbsolutePath();
             final BufferedWriter writer = unsafeIO(() -> newBufferedWriter(outputFile));
-            final WriterStreamRDFPlain syncedTripleSink = new WriterStreamRDFPlain(wrap(writer));
+            final WriterStreamRDFPlain singleTripleSink = new WriterStreamRDFPlain(wrap(writer)) {
+
+                @Override
+                public synchronized void triple(Triple triple) {
+                    super.triple(triple);
+                }
+            };
             final Node graphURI = createURI(graphName);
-            final SingleGraphStreamRDF graphWrapper = new SingleGraphStreamRDF(graphURI, syncedTripleSink);
-            tripleSink = skipEmptyLiterals ? new SkipEmptyLiteralsStreamRDF(graphWrapper) : graphWrapper;
+            final SingleGraphStreamRDF graphWrapper = new SingleGraphStreamRDF(graphURI, singleTripleSink);
+            BulkStreamRDF tripleSink = skipEmptyLiterals ? new SkipEmptyLiteralsStreamRDF(graphWrapper) : graphWrapper;
             bitSinks.add(writer);
+            tripleSinks.add(tripleSink);
             objectProcessors[i] = new ObjectProcessor(objectStoreConn, dsStoreConn, tripleSink);
         }
         objectBlobUris = unsafeIO(() -> uris == null ? objectStoreConn.listBlobIds(null) : uris.iterator());
@@ -226,7 +234,7 @@ public class Extract implements Runnable {
     @Override
     public void run() {
         log.info("Beginning extraction.");
-        tripleSink.startBulk();
+        tripleSinks.forEach(BulkStreamRDF::startBulk);
         objectBlobUris.forEachRemaining(objectId -> extractionThreads
                         .submit(() -> objectProcessors[count(objectId) % numExtractorThreads].accept(objectId)));
         // shutdown
@@ -237,7 +245,7 @@ public class Extract implements Runnable {
             log.error("Interrupted: ", e);
             System.exit(1);
         }
-        tripleSink.finishBulk();
+        tripleSinks.forEach(BulkStreamRDF::finishBulk);
         bitSinks.forEach(IO::flush);
         dsStoreConn.close();
         objectStoreConn.close();
