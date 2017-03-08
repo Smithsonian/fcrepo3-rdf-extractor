@@ -145,7 +145,7 @@ public class ObjectProcessor implements Consumer<URI> {
             parser.accept(rdf);
         } catch (final Exception e) {
             final String verb = errorMessageVerbs.getOrDefault(e.getClass(), "extract triples from");
-            log.error("Couldn't {} datastream {} from object {}!", verb, ds.id(), objectId);
+            log.error("Couldn't {} datastream {} from object {}!", verb, ds != null ? ds.id() : "[NO DS ID]", objectId);
             log.error("Caused by: ", e);
         }
     }
