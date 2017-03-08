@@ -12,6 +12,9 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import org.akubraproject.map.IdMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.twmacinta.util.MD5;
 
 /**
@@ -62,6 +65,8 @@ import com.twmacinta.util.MD5;
  * @author A. Soroka
  */
 public class HashPathIdMapper implements IdMapper {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(HashPathIdMapper.class);
 
     private static final String internalScheme = "file";
 
@@ -95,7 +100,9 @@ public class HashPathIdMapper implements IdMapper {
         buffer.append(internalScheme + ":");
         getPath(uri, buffer);
         encode(uri, buffer);
-        return URI.create(buffer.toString());
+        String internalId = buffer.toString();
+        LOG.debug("Accessing internal URI: {}", internalId);
+        return URI.create(internalId);
     }
 
     //@Override
