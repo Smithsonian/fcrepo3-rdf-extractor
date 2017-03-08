@@ -10,6 +10,10 @@
     <logger name="edu.si" additivity="false" level="${testLogging:-DEBUG}">
         <appender-ref ref="STDOUT"/>
     </logger>
+    <logger name="org.fcrepo.server.storage.lowlevel.akubra.HashPathIdMapper" additivity="false" level="${testLogging:-DEBUG}">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    
     <logger name="com.sun.org.apache.xml.internal.utils.XMLReaderManager" additivity="false">
         <!-- no appender means /dev/null-->
     </logger>
