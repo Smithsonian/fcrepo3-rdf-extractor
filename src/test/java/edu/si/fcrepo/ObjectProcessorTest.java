@@ -16,7 +16,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.lang.CollectorStreamRDF;
-import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -38,21 +37,22 @@ public class ObjectProcessorTest {
         final URI blobId = URI.create(OBJECT_URI);
         final Blob blob = conn.getBlob(blobId, null);
         IOUtils.copy(new ClassPathResource("simple-foxml.xml").getInputStream(), blob.openOutputStream(0, true));
-        final ObjectProcessor testProcessor = new ObjectProcessor(conn, null, tuples);
-        // process the FOXML from that store
-        testProcessor.accept(URI.create(OBJECT_URI));
-        // examine the resulting tuples
-        final List<Triple> triples = tuples.getTriples();
-        assertTrue("Should extract no quads!", tuples.getQuads().isEmpty());
-        final Model results = createDefaultModel();
-        results.setNsPrefixes(tuples.getPrefixes().getMappingCopyStr());
-        triples.forEach(t -> results.add(results.asStatement(t)));
-        final Model rubric = createDefaultModel();
-        rubric.read(new ClassPathResource("simple.nt").getInputStream(), null, "N-TRIPLES");
-        assertTrue("Did not find expected triples!", results.isIsomorphicWith(rubric));
+        try (final ObjectProcessor testProcessor = new ObjectProcessor(conn, null, tuples)) {
+            // process the FOXML from that store
+            testProcessor.accept(URI.create(OBJECT_URI));
+            // examine the resulting tuples
+            final List<Triple> triples = tuples.getTriples();
+            assertTrue("Should extract no quads!", tuples.getQuads().isEmpty());
+            final Model results = createDefaultModel();
+            results.setNsPrefixes(tuples.getPrefixes().getMappingCopyStr());
+            triples.forEach(t -> results.add(results.asStatement(t)));
+            final Model rubric = createDefaultModel();
+            rubric.read(new ClassPathResource("simple.nt").getInputStream(), null, "N-TRIPLES");
+            assertTrue("Did not find expected triples!", results.isIsomorphicWith(rubric));
+        }
     }
 
-    static class CollectingBulkStreamRDF extends CollectorStreamRDF implements BulkStreamRDF {
+    static class CollectingBulkStreamRDF extends CollectorStreamRDF implements AutoCloseableBulkStreamRDF {
 
         @Override
         public void start() {/* NO OP */}
@@ -62,6 +62,9 @@ public class ObjectProcessorTest {
 
         @Override
         public void finishBulk() {/* NO OP */}
+
+        @Override
+        public void close() {/* NO OP */}
 
     }
 }

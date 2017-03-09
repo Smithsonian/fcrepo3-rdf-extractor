@@ -1,7 +1,7 @@
 
 package edu.si.fcrepo.integration.classpath;
 
-import static edu.si.fcrepo.Extract.UnsafeIO.unsafeIO;
+import static edu.si.fcrepo.UnsafeIO.unsafeIO;
 import static java.util.Arrays.stream;
 
 import java.io.IOException;
