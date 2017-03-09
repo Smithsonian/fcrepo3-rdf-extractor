@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE configuration>
 <configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%p %d{HH:mm:ss.SSS} \(%c\) %m%n</pattern>
-        </encoder>
+
+    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator class="edu.si.fcrepo.ThreadNameDiscriminator"/>
+        <sift>
+            <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                    <pattern>${threadName}: %p %d{HH:mm:ss.SSS} \(%c\) %m%n</pattern>
+                </encoder>
+            </appender>
+        </sift>
     </appender>
 
-    <logger name="edu.si" additivity="false" level="${testLogging:-DEBUG}">
-        <appender-ref ref="STDOUT"/>
+    <logger name="edu.si" additivity="false" level="DEBUG">
+        <appender-ref ref="SIFT"/>
     </logger>
-    <logger name="org.fcrepo.server.storage.lowlevel.akubra.HashPathIdMapper" additivity="false" level="${testLogging:-DEBUG}">
-        <appender-ref ref="STDOUT"/>
+    <logger name="org.fcrepo.server.storage.lowlevel.akubra.HashPathIdMapper" additivity="false"
+        level="${testLogging:-DEBUG}">
+        <appender-ref ref="SIFT"/>
     </logger>
-    
+
+
     <logger name="com.sun.org.apache.xml.internal.utils.XMLReaderManager" additivity="false">
         <!-- no appender means /dev/null-->
     </logger>

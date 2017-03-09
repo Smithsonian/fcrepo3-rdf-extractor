@@ -97,6 +97,7 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
         this.dsStoreConnection = dsStoreConnection;
         this.objectStoreConnection = objStoreConnection;
         this.tripleSink = tripleSink;
+        tripleSink.startBulk();
     }
 
     @Override
