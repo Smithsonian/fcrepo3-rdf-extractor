@@ -8,6 +8,7 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import java.io.BufferedWriter;
 import java.nio.file.Path;
 
+import org.apache.jena.atlas.io.AWriter;
 import org.apache.jena.atlas.io.IO;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.writer.WriterStreamRDFPlain;
@@ -20,17 +21,24 @@ public class TripleDump implements AutoCloseableBulkStreamRDF {
 
     private final BufferedWriter writer;
 
+    private static class SyncWriterStreamRDFPlain extends WriterStreamRDFPlain {
+
+        public SyncWriterStreamRDFPlain(AWriter w) {
+            super(w);
+        }
+
+        @Override
+        public synchronized void quad(Quad q) {
+            super.quad(q);
+        }
+    }
+
     public TripleDump(Path outputLocation, String graphName, boolean skipEmptyLiterals) {
         this.writer = unsafeIO(() -> newBufferedWriter(outputLocation));
-        final WriterStreamRDFPlain singleTripleSink = new WriterStreamRDFPlain(wrap(writer)) {
-
-            @Override
-            public synchronized void triple(Triple triple) {
-                super.triple(triple);
-            }
-        };
+        final WriterStreamRDFPlain singleTripleSink = new SyncWriterStreamRDFPlain(wrap(writer));
         final SingleGraphStreamRDF graphWrapper = new SingleGraphStreamRDF(createURI(graphName), singleTripleSink);
         this.tripleSink = skipEmptyLiterals ? new SkipEmptyLiteralsStreamRDF(graphWrapper) : graphWrapper;
+        tripleSink.startBulk();
     }
 
     @Override

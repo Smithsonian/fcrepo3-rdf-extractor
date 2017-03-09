@@ -43,6 +43,8 @@ public class SingleGraphStreamRDF extends StreamRDFWrapper implements BulkStream
     }
 
     @Override
-    public void startBulk() {  
+    public void startBulk() {
+        other.start();
+        if (other instanceof BulkStreamRDF) ((BulkStreamRDF) other).startBulk();
     }
 }

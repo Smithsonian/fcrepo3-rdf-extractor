@@ -51,6 +51,7 @@ public class SidoraExamplesIT {
         PIDS.forEach(pid -> {
             testExtractor.uris = singletonList(URI.create("info:fedora/" + pid));
             final String fileName = pid.replace(':', '-');
+            testExtractor.skipEmptyLiterals = true;
             testExtractor.outputLocation = resultsDir + "/" + fileName;
             log.debug("Using output location: {}", testExtractor.outputLocation);
             testExtractor.interval = 1;
