@@ -1,22 +1,17 @@
 
 package edu.si.fcrepo;
-
 import static com.github.rvesse.airline.SingleCommand.singleCommand;
 import static com.github.rvesse.airline.help.Help.help;
 import static com.google.common.collect.Queues.newArrayBlockingQueue;
-import static edu.si.fcrepo.Extract.UnsafeIO.unsafeIO;
+import static edu.si.fcrepo.UnsafeIO.unsafeIO;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Runtime.getRuntime;
-import static java.nio.file.Files.newBufferedWriter;
 import static java.util.concurrent.TimeUnit.DAYS;
-import static org.apache.jena.atlas.io.IO.wrap;
-import static org.apache.jena.graph.NodeFactory.createURI;
+import static java.util.stream.Collectors.summingInt;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,26 +21,16 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.function.Consumer;
-
-import javax.inject.Inject;
 
 import org.akubraproject.BlobStore;
 import org.akubraproject.BlobStoreConnection;
-import org.apache.jena.atlas.RuntimeIOException;
-import org.apache.jena.atlas.io.IO;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.Triple;
-import org.apache.jena.riot.writer.WriterStreamRDFPlain;
 import org.apache.jena.system.JenaSystem;
-import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.Lifecycle;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
-import com.github.rvesse.airline.HelpOption;
 import com.github.rvesse.airline.SingleCommand;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
@@ -140,10 +125,7 @@ public class Extract implements Runnable {
 
     private Iterator<URI> objectBlobUris;
 
-    private Consumer<URI>[] objectProcessors;
-
-    private List<Writer> bitSinks;
-    private List<BulkStreamRDF> tripleSinks;
+    private List<ObjectProcessor> objectProcessors;
 
     private volatile int count = 0;
 
@@ -202,41 +184,33 @@ public class Extract implements Runnable {
         final BlobStore objectStore = getBlobStore("objectStore");
         objectStoreConn = unsafeIO(() -> objectStore.openConnection(null, null));
 
-        objectProcessors = new ObjectProcessor[numExtractorThreads];
-        bitSinks = new ArrayList<>(numExtractorThreads);
-        tripleSinks = new ArrayList<>(numExtractorThreads);
+        objectProcessors = new ArrayList<>(numExtractorThreads);
 
         for (int i = 0; i < numExtractorThreads; i++) {
             Path outputFile = Paths.get(outputLocation, "quads" + i + ".nq").toAbsolutePath();
-            final BufferedWriter writer = unsafeIO(() -> newBufferedWriter(outputFile));
-            final WriterStreamRDFPlain singleTripleSink = new WriterStreamRDFPlain(wrap(writer)) {
-
-                @Override
-                public synchronized void triple(Triple triple) {
-                    super.triple(triple);
-                }
-            };
-            final Node graphURI = createURI(graphName);
-            final SingleGraphStreamRDF graphWrapper = new SingleGraphStreamRDF(graphURI, singleTripleSink);
-            BulkStreamRDF tripleSink = skipEmptyLiterals ? new SkipEmptyLiteralsStreamRDF(graphWrapper) : graphWrapper;
-            bitSinks.add(writer);
-            tripleSinks.add(tripleSink);
-            objectProcessors[i] = new ObjectProcessor(objectStoreConn, dsStoreConn, tripleSink);
+            objectProcessors.add(new ObjectProcessor(objectStoreConn, dsStoreConn, new TripleDump(outputFile, graphName, skipEmptyLiterals)));
         }
         objectBlobUris = unsafeIO(() -> uris == null ? objectStoreConn.listBlobIds(null) : uris.iterator());
     }
 
     private int count(final URI u) {
-        if (++count % interval == 0) log.info("Reached {} objects at {} with {} in-queue.", count, u, queue.size());
+        if (++count % interval == 0) logSummary(u.toString());
         return count;
+    }
+
+    private void logSummary(final String u) {
+        log.info("Reached {} objects at {} with {} in-queue after {} errors.", count, u, queue.size(), errors());
+    }
+    
+    private int errors() {
+        return objectProcessors.stream().collect(summingInt(ObjectProcessor::errors));
     }
 
     @Override
     public void run() {
         log.info("Beginning extraction.");
-        tripleSinks.forEach(BulkStreamRDF::startBulk);
         objectBlobUris.forEachRemaining(objectId -> extractionThreads
-                        .submit(() -> objectProcessors[count(objectId) % numExtractorThreads].accept(objectId)));
+                        .submit(() -> objectProcessors.get(count(objectId) % numExtractorThreads).accept(objectId)));
         // shutdown
         try {
             extractionThreads.shutdown();
@@ -245,29 +219,12 @@ public class Extract implements Runnable {
             log.error("Interrupted: ", e);
             System.exit(1);
         }
-        tripleSinks.forEach(BulkStreamRDF::finishBulk);
-        bitSinks.forEach(IO::flush);
+        objectProcessors.forEach(ObjectProcessor::close);
         dsStoreConn.close();
         objectStoreConn.close();
         ((Lifecycle) akubraContext).stop();
+        logSummary("end of objects");
         log.info("Finished extraction.");
-    }
-
-    /**
-     * IOException => RuntimeIOException
-     */
-    @FunctionalInterface
-    public interface UnsafeIO<T> {
-
-        T call() throws IOException;
-
-        static <U> U unsafeIO(UnsafeIO<U> u) {
-            try {
-                return u.call();
-            } catch (IOException e) {
-                throw new RuntimeIOException(e);
-            }
-        }
     }
 
 }

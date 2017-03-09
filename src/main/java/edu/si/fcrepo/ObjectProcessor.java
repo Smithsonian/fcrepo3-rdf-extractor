@@ -47,8 +47,6 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RiotException;
-import org.apache.jena.riot.system.StreamRDF;
-import org.apache.jena.tdb.store.bulkloader.BulkStreamRDF;
 import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
@@ -59,13 +57,25 @@ import com.github.cwilper.fcrepo.dto.core.FedoraObject;
 import com.github.cwilper.fcrepo.dto.core.io.ContentHandler;
 import com.github.cwilper.fcrepo.dto.foxml.FOXMLReader;
 
-public class ObjectProcessor implements Consumer<URI> {
+/**
+ * Responsible for extracting triples from objects. Not thread-safe!
+ * 
+ * @author ajs6f
+ *
+ */
+public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
 
     private final BlobStoreConnection dsStoreConnection;
 
     private final BlobStoreConnection objectStoreConnection;
 
-    private final StreamRDF tripleSink;
+    private final AutoCloseableBulkStreamRDF tripleSink;
+
+    private int errors = 0;
+
+    public int errors() {
+        return errors;
+    }
 
     private static final SAXParserFactory saxFactory = newInstance();
 
@@ -82,17 +92,11 @@ public class ObjectProcessor implements Consumer<URI> {
 
     private static final Logger log = getLogger(ObjectProcessor.class);
 
-    private static interface StatelessContentHandler extends ContentHandler {
-
-        @Override
-        default void close() {/* NO OP */}
-    }
-
     public ObjectProcessor(final BlobStoreConnection objStoreConnection, final BlobStoreConnection dsStoreConnection,
-                    final BulkStreamRDF triplesSink) {
+                    final AutoCloseableBulkStreamRDF tripleSink) {
         this.dsStoreConnection = dsStoreConnection;
         this.objectStoreConnection = objStoreConnection;
-        this.tripleSink = triplesSink;
+        this.tripleSink = tripleSink;
     }
 
     @Override
@@ -127,11 +131,15 @@ public class ObjectProcessor implements Consumer<URI> {
 
             }
         } catch (final IOException e) {
-            log.error("Error reading from object: " + objectId, e);
+            error("Error reading from object: " + objectId, e);
         } catch (final Exception e) {
-            log.error("Error extracting from object: " + objectId, e);
-            log.error("Only some triples were extracted for {}!", objectId);
+            error("Error extracting from object: " + objectId, e);
         }
+    }
+
+    private void error(String msg, Throwable e) {
+        errors++;
+        log.error(msg, e);
     }
 
     @FunctionalInterface
@@ -145,8 +153,8 @@ public class ObjectProcessor implements Consumer<URI> {
             parser.accept(rdf);
         } catch (final Exception e) {
             final String verb = errorMessageVerbs.getOrDefault(e.getClass(), "extract triples from");
-            log.error("Couldn't {} datastream {} from object {}!", verb, ds != null ? ds.id() : "[NO DS ID]", objectId);
-            log.error("Caused by: ", e);
+            String dsId = ds != null ? ds.id() : "[NO DS ID]";
+            error("Couldn't " + verb + " datastream " + dsId + " from object " + objectId + "! Caused by:", e);
         }
     }
 
@@ -164,17 +172,17 @@ public class ObjectProcessor implements Consumer<URI> {
         final URI contentLocation = currentVersion.contentLocation();
         final ControlGroup controlGroup = datastream.controlGroup();
         switch (controlGroup) {
-            case MANAGED:
-                final Blob blob = dsStoreConnection.getBlob(contentLocation, null);
-                return blob.openInputStream();
-            case REDIRECT:
-            case EXTERNAL:
-                return contentLocation.toURL().openStream();
-            case INLINE_XML:
-                return new ByteArrayInputStream(currentVersion.inlineXML().bytes());
-            default:
-                throw new IllegalArgumentException("Unknown datastream control group value: " + controlGroup +
-                                " for datastream: " + datastream);
+        case MANAGED:
+            final Blob blob = dsStoreConnection.getBlob(contentLocation, null);
+            return blob.openInputStream();
+        case REDIRECT:
+        case EXTERNAL:
+            return contentLocation.toURL().openStream();
+        case INLINE_XML:
+            return new ByteArrayInputStream(currentVersion.inlineXML().bytes());
+        default:
+            throw new IllegalArgumentException("Unknown datastream control group value: " + controlGroup
+                            + " for datastream: " + datastream);
         }
     }
 
@@ -224,5 +232,16 @@ public class ObjectProcessor implements Consumer<URI> {
 
     private static String isoDate(final Date d) {
         return ZonedDateTime.ofInstant(d.toInstant(), UTC).format(ISO_INSTANT);
+    }
+
+    private static interface StatelessContentHandler extends ContentHandler {
+
+        @Override
+        default void close() {/* NO OP */}
+    }
+
+    @Override
+    public void close() {
+        tripleSink.close();
     }
 }
