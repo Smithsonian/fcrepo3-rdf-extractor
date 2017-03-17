@@ -18,6 +18,7 @@ import static java.time.ZoneOffset.UTC;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static javax.xml.parsers.SAXParserFactory.newInstance;
 import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDdateTime;
+import static org.apache.jena.ext.com.google.common.base.Strings.nullToEmpty;
 import static org.apache.jena.ext.com.google.common.collect.ImmutableMap.of;
 import static org.apache.jena.graph.NodeFactory.createLiteral;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -43,6 +44,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.akubraproject.Blob;
 import org.akubraproject.BlobStoreConnection;
 import org.akubraproject.MissingBlobException;
+import org.apache.jena.ext.com.google.common.base.Strings;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.RDFDataMgr;
@@ -196,8 +198,8 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
      */
     private static Triple[] constantObjectTriples(final FedoraObject object, final Node objectUri) {
         final Triple[] triples = new Triple[6];
-        triples[0] = create(objectUri, LABEL, createLiteral(object.label()));
-        triples[1] = create(objectUri, OWNER, createLiteral(object.ownerId()));
+        triples[0] = create(objectUri, LABEL, createLiteral(nullToEmpty(object.label())));
+        triples[1] = create(objectUri, OWNER, createLiteral(nullToEmpty(object.ownerId())));
         triples[2] = create(objectUri, STATE, state(object.state()));
         final Date createdDate = object.createdDate();
         final Date lastModifiedDate = object.lastModifiedDate();
