@@ -13,24 +13,62 @@
 
   <name>fcrepo3-rdf-extractor</name>
 
-  <scm>
-    <url>https://github.com/ajs6f/fcrepo3-rdf-extractor</url>
-  </scm>
-  <url>https://github.com/ajs6f/fcrepo3-rdf-extractor</url>
+  <url>https://github.com/Smithsonian/fcrepo3-rdf-extractor</url>
   <description>A utility to extract RDF triples from Fedora Comons 3 Akubra-based persistence stores.</description>
+
+  <organization>
+    <name>Smithsonian Institution</name>
+    <url>http://si.edu</url>
+  </organization>
 
   <developers>
     <developer>
       <id>ajs6f</id>
-      <email>adam@asoroka.com</email>
+      <email>sorokaa@si.edu</email>
       <timezone>America/New_York</timezone>
+      <organization>Smithsonian Institution</organization>
+      <organizationUrl>http://si.edu</organizationUrl>
       <roles>
         <role>Originator</role>
       </roles>
     </developer>
+
+    <developer>
+      <id>davisda</id>
+      <name>Daniel Davis</name>
+      <email>davisda at si dot edu</email>
+      <timezone>America/New_York</timezone>
+      <organization>Smithsonian Institution</organization>
+      <organizationUrl>http://si.edu</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
   </developers>
 
+  <licenses>
+    <license>
+      <name>Licensed under the Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <comments>Copyright (c) 2017 Smithsonian Institution</comments>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <issueManagement>
+    <system>jira</system>
+    <url>https://jira.si.edu</url>
+  </issueManagement>
+
+  <scm>
+    <developerConnection>scm:git:git@github.com:Smithsonian/fcrepo3-rdf-extractor.git</developerConnection>
+    <connection>scm:git:git://github.com/Smithsonian/fcrepo3-rdf-extractor.git</connection>
+    <url>scm:git:git://github.com/Smithsonian/fcrepo3-rdf-extractor.git</url>
+    <tag>HEAD</tag>
+  </scm>
+
   <properties>
+    <project.copyrightYear>2017</project.copyrightYear>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <akubra.version>0.4.0</akubra.version>
@@ -279,6 +317,42 @@
                 </transformer>
               </transformers>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>2.11</version>
+        <configuration>
+          <header>LICENSE_HEADER.txt</header>
+          <mapping>
+            <java>SLASHSTAR_STYLE</java>
+          </mapping>
+          <includes>
+            <include>**/src/main/java/**</include>
+            <include>**/src/test/java/**</include>
+          </includes>
+          <excludes>
+            <exclude>target/**</exclude>
+            <exclude>**/src/test/resources/**</exclude>
+            <exclude>**/src/main/resources/**</exclude>
+            <exclude>**/*.properties</exclude>
+          </excludes>
+          <properties>
+            <name>${project.artifactId}</name>
+            <year>${project.copyrightYear}</year>
+            <holder>${project.organization.name}</holder>
+          </properties>
+          <encoding>UTF-8</encoding>
+          <strictCheck>true</strictCheck>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
