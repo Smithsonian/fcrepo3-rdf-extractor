@@ -69,3 +69,4 @@
 <info:fedora/si:1119> <info:fedora/fedora-system:def/view#disseminates> <info:fedora/si:1119/TN> .
 <info:fedora/si:1119/POLICY> <info:fedora/fedora-system:def/model#state> <info:fedora/fedora-system:def/model#Active> .
 <info:fedora/si:1119/TN> <info:fedora/fedora-system:def/view#isVolatile> "false" .
+<info:fedora/si:1119> <http://foo.ca/ontology/relsext#width> "4478" .

@@ -72,6 +72,7 @@ xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/
     <islandora:isManageableByUser>fedoraAdmin</islandora:isManageableByUser>
     <islandora:isManageableByUser>sternb</islandora:isManageableByUser>
     <islandora:isManageableByRole>administrator</islandora:isManageableByRole>
+    <width xmlns="http://foo.ca/ontology/relsext#">4478</width>
   </rdf:Description>
 </rdf:RDF>
 </foxml:xmlContent>
