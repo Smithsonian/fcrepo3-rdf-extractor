@@ -28,11 +28,12 @@
 package edu.si.fcrepo;
 import static com.github.rvesse.airline.SingleCommand.singleCommand;
 import static com.github.rvesse.airline.help.Help.help;
-import static com.google.common.collect.Queues.newArrayBlockingQueue;
 import static edu.si.fcrepo.UnsafeIO.unsafeIO;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.Runtime.getRuntime;
+import static java.util.Collections.nCopies;
 import static java.util.concurrent.TimeUnit.DAYS;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.summingInt;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -66,7 +67,6 @@ import com.github.rvesse.airline.annotations.restrictions.Once;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import com.github.rvesse.airline.annotations.restrictions.ranges.IntegerRange;
 import com.github.rvesse.airline.parser.errors.ParseOptionMissingException;
-import com.google.common.base.Strings;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -157,6 +157,8 @@ public class Extract implements Runnable {
 
     private ArrayBlockingQueue<Runnable> queue;
 
+    private static final String starLine = nCopies(80, "*").stream().collect(joining());
+
     public static void main(final String[] args) throws IOException {
         final SingleCommand<Extract> cliParser = singleCommand(Extract.class);
         try {
@@ -164,7 +166,6 @@ public class Extract implements Runnable {
             extractor.init();
             extractor.run();
         } catch (ParseOptionMissingException e) {
-            String starLine = "\n"+ Strings.padEnd("*", 80, '*') +"\n";
             String errorBlock = starLine + e.getLocalizedMessage() + starLine;
             System.err.println(errorBlock);
             help(cliParser.getCommandMetadata());
@@ -189,7 +190,7 @@ public class Extract implements Runnable {
             }
         }
 
-        queue = newArrayBlockingQueue(queueSize);
+        queue = new ArrayBlockingQueue<>(queueSize);
         extractionThreads = new ThreadPoolExecutor(numExtractorThreads, numExtractorThreads, MAX_VALUE, DAYS, queue);
         log.info("Using {} threads for extraction and a queue size of {}.", numExtractorThreads, queueSize);
 
