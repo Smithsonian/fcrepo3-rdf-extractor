@@ -92,24 +92,12 @@
       <groupId>org.akubraproject</groupId>
       <artifactId>akubra-fs</artifactId>
       <version>${akubra.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava-collections</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.akubraproject</groupId>
       <artifactId>akubra-map</artifactId>
       <version>${akubra.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava-collections</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
