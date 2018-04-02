@@ -107,6 +107,9 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
     private static final SAXParserFactory saxFactory = newInstance();
 
     static {
+        System.setProperty("javax.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
+        System.setProperty("javax.xml.stream.XMLInputFactory", "com.ctc.wstx.stax.WstxInputFactory");
+
         sendSystemOutAndErrToSLF4J();
         try {
             saxFactory.setFeature("http://xml.org/sax/features/xmlns-uris", true);

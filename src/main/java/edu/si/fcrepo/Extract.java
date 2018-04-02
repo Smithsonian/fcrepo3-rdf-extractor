@@ -115,6 +115,7 @@ public class Extract implements Runnable {
     @Option(name = { "-o",
                     "--outputLocation" }, title = "OutputLocation", description = "The output directory into which to extract triples", arity = 1)
     @Once
+    @Required
     @NotBlank
     public String outputLocation;
 

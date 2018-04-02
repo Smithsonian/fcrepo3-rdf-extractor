@@ -106,6 +106,12 @@
       <version>1.0.0</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
+      <version>5.0.3</version>
+    </dependency>
+
     <!-- For emulating the hashing behavior of Fedora 3 -->
     <dependency>
       <groupId>fast-md5</groupId>
