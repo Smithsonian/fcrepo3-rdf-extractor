@@ -27,6 +27,7 @@
 
 package edu.si.fcrepo;
 
+import static edu.si.fcrepo.AkubraIDConverter.getBlobId;
 import static edu.si.fcrepo.RdfVocabulary.CREATEDDATE;
 import static edu.si.fcrepo.RdfVocabulary.DISSEMINATES;
 import static edu.si.fcrepo.RdfVocabulary.DISSEMINATION_TYPE;
@@ -86,7 +87,7 @@ import com.github.cwilper.fcrepo.dto.foxml.FOXMLReader;
 
 /**
  * Responsible for extracting triples from objects. Not thread-safe!
- * 
+ *
  * @author ajs6f
  *
  */
@@ -168,7 +169,7 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
         }
     }
 
-    private void error(String msg, Throwable e) {
+    private void error(final String msg, final Throwable e) {
         errors++;
         log.error(msg, e);
     }
@@ -184,7 +185,7 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
             parser.accept(rdf);
         } catch (final Exception e) {
             final String verb = errorMessageVerbs.getOrDefault(e.getClass(), "extract triples from");
-            String dsId = ds != null ? ds.id() : "[NO DS ID]";
+            final String dsId = ds != null ? ds.id() : "[NO DS ID]";
             error("Couldn't " + verb + " datastream " + dsId + " from object " + objectId + "! Caused by:", e);
         }
     }
@@ -204,7 +205,7 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
         final ControlGroup controlGroup = datastream.controlGroup();
         switch (controlGroup) {
         case MANAGED:
-            final Blob blob = dsStoreConnection.getBlob(contentLocation, null);
+            final Blob blob = dsStoreConnection.getBlob(getBlobId(contentLocation), null);
             return blob.openInputStream();
         case REDIRECT:
         case EXTERNAL:
