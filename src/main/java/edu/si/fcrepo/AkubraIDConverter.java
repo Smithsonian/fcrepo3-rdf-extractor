@@ -6,10 +6,10 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 
 /**
- * Utility functions extracted from: org.fcrepo.server.storage.lowlevel.akubra.AkubraLowLevelStorage Originally
- * authored by
+ * Utility functions extracted/modified based on org.fcrepo.server.storage.lowlevel.akubra.AkubraLowLevelStorage.
+ * Original code authored by Chris Wilper
  *
- * @author Chris Wilper
+ * @author whikloj
  */
 public class AkubraIDConverter {
 
