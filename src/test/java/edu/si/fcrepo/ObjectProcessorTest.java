@@ -27,7 +27,9 @@
 
 package edu.si.fcrepo;
 
+import static edu.si.fcrepo.ObjectProcessor.getBlobId;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -48,6 +50,8 @@ import org.springframework.core.io.ClassPathResource;
 public class ObjectProcessorTest {
 
     private static final String OBJECT_URI = "info:fedora/simple:object";
+
+    private static String FEDORA_URI = "info:fedora/";
 
     private final BlobStore objectStore = new MemBlobStore();
 
@@ -92,5 +96,49 @@ public class ObjectProcessorTest {
         @Override
         public void close() {/* NO OP */}
 
+    }
+
+    @Test
+    public void testObjectIDNoPrefix() {
+        final String objectID = "testid:123";
+        final URI expected = URI.create(FEDORA_URI + objectID);
+        final URI output1 = getBlobId(objectID);
+        assertEquals("Incorrect object blobId built from string.", expected, output1);
+
+        final URI output2 = getBlobId(URI.create(objectID));
+        assertEquals("Incorrect object blobId built from URI.", expected, output2);
+    }
+
+    @Test
+    public void testObjectID() {
+        final String objectID = FEDORA_URI + "testid:123";
+        final URI expected = URI.create(objectID);
+        final URI output1 = getBlobId(objectID);
+        assertEquals("Incorrect object blobId built from string.", expected, output1);
+
+        final URI output2 = getBlobId(URI.create(objectID));
+        assertEquals("Incorrect object blobId built from URI.", expected, output2);
+    }
+
+    @Test
+    public void testDsIDNoPrefix() {
+        final String objectID = "testid:123+DC+DC.0";
+        final URI expected = URI.create(FEDORA_URI + "testid:123/DC/DC.0");
+        final URI output1 = getBlobId(objectID);
+        assertEquals("Incorrect datastream blobId built from string.", expected, output1);
+
+        final URI output2 = getBlobId(URI.create(objectID));
+        assertEquals("Incorrect datastream blobId built from URI.", expected, output2);
+    }
+
+    @Test
+    public void testDsID() {
+        final String objectID = FEDORA_URI + "testid:123+DC+DC.0";
+        final URI expected = URI.create(FEDORA_URI + "testid:123/DC/DC.0");
+        final URI output1 = getBlobId(objectID);
+        assertEquals("Incorrect datastream blobId built from string.", expected, output1);
+
+        final URI output2 = getBlobId(URI.create(objectID));
+        assertEquals("Incorrect datastream blobId built from URI.", expected, output2);
     }
 }

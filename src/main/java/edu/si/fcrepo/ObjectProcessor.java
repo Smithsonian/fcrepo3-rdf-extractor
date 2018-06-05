@@ -27,7 +27,6 @@
 
 package edu.si.fcrepo;
 
-import static edu.si.fcrepo.AkubraIDConverter.getBlobId;
 import static edu.si.fcrepo.RdfVocabulary.CREATEDDATE;
 import static edu.si.fcrepo.RdfVocabulary.DISSEMINATES;
 import static edu.si.fcrepo.RdfVocabulary.DISSEMINATION_TYPE;
@@ -57,7 +56,10 @@ import static uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J.sendSystemOutAn
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.IdentityHashMap;
@@ -107,6 +109,11 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
 
     private static final SAXParserFactory saxFactory = newInstance();
 
+    /**
+     * Rather than bring in the entire PID class to get a string.
+     */
+    private static String FEDORA_URI = "info:fedora/";
+
     static {
         System.setProperty("javax.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
         System.setProperty("javax.xml.stream.XMLInputFactory", "com.ctc.wstx.stax.WstxInputFactory");
@@ -143,11 +150,14 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
                 final FedoraObject object = foxmlReader.readObject(objectBits);
                 foxmlReader.close();
                 // constant per-resource triples
-                for (final Triple t : constantObjectTriples(object, createURI("info:fedora/" + object.pid())))
+                for (final Triple t : constantObjectTriples(object, createURI("info:fedora/" + object.pid()))) {
                     sink(t);
-                for (final Datastream ds : object.datastreams().values())
-                    for (final Triple t : constantDatastreamTriples("info:fedora/" + object.pid(), ds))
+                }
+                for (final Datastream ds : object.datastreams().values()) {
+                    for (final Triple t : constantDatastreamTriples("info:fedora/" + object.pid(), ds)) {
                         sink(t);
+                    }
+                }
 
                 final Datastream dcDatastream = object.datastreams().get("DC");
                 final Datastream relsIntDatastream = object.datastreams().get("RELS-INT");
@@ -157,8 +167,9 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
                     final SAXParser parser = saxFactory.newSAXParser();
                     parser.parse(dcXML, new DublinCoreContentHandler(tripleSink, createURI(objectId.toString())));
                 });
-                if (relsIntDatastream != null)
+                if (relsIntDatastream != null) {
                     consume(objectId, relsIntDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
+                }
                 consume(objectId, relsExtDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
 
             }
@@ -248,7 +259,9 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
      */
     private static Triple[] constantDatastreamTriples(final String objectUri, final Datastream ds) {
         final String dsId = ds.id();
-        if (dsId.equals("AUDIT")) return new Triple[0];
+        if (dsId.equals("AUDIT")) {
+            return new Triple[0];
+        }
         final Triple[] triples = new Triple[6];
         final Node dsUri = createURI(objectUri + "/" + dsId);
         final DatastreamVersion latestVersion = ds.versions().first();
@@ -275,5 +288,65 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
     @Override
     public void close() {
         tripleSink.close();
+    }
+
+    /**
+     * Converts a token to a token-as-blobId.
+     *
+     * @param token the token to convert
+     * @return the AkubraLowLevelStorage BlobId
+     */
+    public static URI getBlobId(final URI token) {
+        return getBlobId(token.toString());
+    }
+
+    /**
+     * Converts a token to a token-as-blobId.
+     * <p>
+     * Object tokens are simply prepended with <code>info:fedora/</code>, whereas datastream tokens are additionally
+     * converted such that <code>ns:id+dsId+dsVersionId</code> becomes
+     * <code>info:fedora/ns:id/dsId/dsVersionId</code>, with the dsId and dsVersionId segments URI-percent-encoded
+     * with UTF-8 character encoding.
+     *
+     * @param token the token to convert.
+     * @return the blob id.
+     * @throws IllegalArgumentException if the token is not a well-formed pid or datastream token.
+     */
+    public static URI getBlobId(final String token) {
+        try {
+            final int i = token.indexOf('+');
+            if (i == -1) {
+                // This is an object reference, just return it with the proper prefix.
+                return new URI((token.startsWith(FEDORA_URI) ? "" : FEDORA_URI) + token);
+            } else {
+                // Split up into [ id, dsId, ds Version Id ]
+                final String[] dsParts = token.split("\\+");
+                if (dsParts.length != 3) {
+                    throw new IllegalArgumentException(
+                            "Malformed datastream token: " + token);
+                }
+                final String encodedToken = dsParts[0] + "/" + uriEncode(dsParts[1]) + "/" + uriEncode(
+                        dsParts[2]);
+
+                return new URI((token.startsWith(FEDORA_URI) ? "" : FEDORA_URI) + encodedToken);
+            }
+        } catch (final URISyntaxException e) {
+            throw new IllegalArgumentException(
+                    "Malformed object or datastream token: " + token, e);
+        }
+    }
+
+    /**
+     * Encode as UTF-8
+     *
+     * @param s string to encode
+     * @return encoded string
+     */
+    private static String uriEncode(final String s) {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        } catch (final UnsupportedEncodingException e) {
+            throw new IllegalArgumentException("Unsupported encoding", e);
+        }
     }
 }
