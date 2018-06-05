@@ -56,7 +56,10 @@ import static uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J.sendSystemOutAn
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.IdentityHashMap;
@@ -86,7 +89,7 @@ import com.github.cwilper.fcrepo.dto.foxml.FOXMLReader;
 
 /**
  * Responsible for extracting triples from objects. Not thread-safe!
- * 
+ *
  * @author ajs6f
  *
  */
@@ -105,6 +108,11 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
     }
 
     private static final SAXParserFactory saxFactory = newInstance();
+
+    /**
+     * Rather than bring in the entire PID class to get a string.
+     */
+    private static String FEDORA_URI = "info:fedora/";
 
     static {
         System.setProperty("javax.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
@@ -168,7 +176,7 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
         }
     }
 
-    private void error(String msg, Throwable e) {
+    private void error(final String msg, final Throwable e) {
         errors++;
         log.error(msg, e);
     }
@@ -184,7 +192,7 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
             parser.accept(rdf);
         } catch (final Exception e) {
             final String verb = errorMessageVerbs.getOrDefault(e.getClass(), "extract triples from");
-            String dsId = ds != null ? ds.id() : "[NO DS ID]";
+            final String dsId = ds != null ? ds.id() : "[NO DS ID]";
             error("Couldn't " + verb + " datastream " + dsId + " from object " + objectId + "! Caused by:", e);
         }
     }
@@ -204,7 +212,7 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
         final ControlGroup controlGroup = datastream.controlGroup();
         switch (controlGroup) {
         case MANAGED:
-            final Blob blob = dsStoreConnection.getBlob(contentLocation, null);
+            final Blob blob = dsStoreConnection.getBlob(getBlobId(contentLocation), null);
             return blob.openInputStream();
         case REDIRECT:
         case EXTERNAL:
@@ -274,5 +282,61 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
     @Override
     public void close() {
         tripleSink.close();
+    }
+
+    /**
+     * Converts a token to a token-as-blobId.
+     *
+     * @param token the token to convert
+     * @return the AkubraLowLevelStorage BlobId
+     */
+    static URI getBlobId(final URI token) {
+        return getBlobId(token.toString());
+    }
+
+    /**
+     * Converts a token to a token-as-blobId.
+     * <p>
+     * Object tokens are simply prepended with <code>info:fedora/</code>, whereas datastream tokens are additionally
+     * converted such that <code>ns:id+dsId+dsVersionId</code> becomes
+     * <code>info:fedora/ns:id/dsId/dsVersionId</code>, with the dsId and dsVersionId segments URI-percent-encoded
+     * with UTF-8 character encoding.
+     *
+     * @param token the token to convert.
+     * @return the blob id.
+     * @throws IllegalArgumentException if the token is not a well-formed pid or datastream token.
+     */
+    static URI getBlobId(final String token) {
+        try {
+            final int i = token.indexOf('+');
+            if (i == -1)
+                // This is an object reference, just return it with the proper prefix.
+                return new URI((token.startsWith(FEDORA_URI) ? "" : FEDORA_URI) + token);
+            else {
+                // Split up into [ id, dsId, ds Version Id ]
+                final String[] dsParts = token.split("\\+");
+                if (dsParts.length != 3)
+                    throw new IllegalArgumentException("Malformed datastream token: " + token);
+                final String encodedToken = dsParts[0] + "/" + uriEncode(dsParts[1]) + "/" + uriEncode(
+                        dsParts[2]);
+                return new URI((token.startsWith(FEDORA_URI) ? "" : FEDORA_URI) + encodedToken);
+            }
+        } catch (final URISyntaxException e) {
+            throw new IllegalArgumentException("Malformed object or datastream token: " + token, e);
+        }
+    }
+
+    /**
+     * Encode as UTF-8
+     *
+     * @param s string to encode
+     * @return encoded string
+     */
+    private static String uriEncode(final String s) {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        } catch (final UnsupportedEncodingException e) {
+            throw new IllegalArgumentException("Unsupported encoding", e);
+        }
     }
 }
