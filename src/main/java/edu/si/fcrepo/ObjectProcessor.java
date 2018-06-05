@@ -150,14 +150,11 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
                 final FedoraObject object = foxmlReader.readObject(objectBits);
                 foxmlReader.close();
                 // constant per-resource triples
-                for (final Triple t : constantObjectTriples(object, createURI("info:fedora/" + object.pid()))) {
+                for (final Triple t : constantObjectTriples(object, createURI("info:fedora/" + object.pid())))
                     sink(t);
-                }
-                for (final Datastream ds : object.datastreams().values()) {
-                    for (final Triple t : constantDatastreamTriples("info:fedora/" + object.pid(), ds)) {
+                for (final Datastream ds : object.datastreams().values())
+                    for (final Triple t : constantDatastreamTriples("info:fedora/" + object.pid(), ds))
                         sink(t);
-                    }
-                }
 
                 final Datastream dcDatastream = object.datastreams().get("DC");
                 final Datastream relsIntDatastream = object.datastreams().get("RELS-INT");
@@ -167,9 +164,8 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
                     final SAXParser parser = saxFactory.newSAXParser();
                     parser.parse(dcXML, new DublinCoreContentHandler(tripleSink, createURI(objectId.toString())));
                 });
-                if (relsIntDatastream != null) {
+                if (relsIntDatastream != null)
                     consume(objectId, relsIntDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
-                }
                 consume(objectId, relsExtDatastream, rdf -> RDFDataMgr.parse(tripleSink, rdf, RDFXML));
 
             }
@@ -259,9 +255,7 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
      */
     private static Triple[] constantDatastreamTriples(final String objectUri, final Datastream ds) {
         final String dsId = ds.id();
-        if (dsId.equals("AUDIT")) {
-            return new Triple[0];
-        }
+        if (dsId.equals("AUDIT")) return new Triple[0];
         final Triple[] triples = new Triple[6];
         final Node dsUri = createURI(objectUri + "/" + dsId);
         final DatastreamVersion latestVersion = ds.versions().first();
@@ -296,7 +290,7 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
      * @param token the token to convert
      * @return the AkubraLowLevelStorage BlobId
      */
-    public static URI getBlobId(final URI token) {
+    static URI getBlobId(final URI token) {
         return getBlobId(token.toString());
     }
 
@@ -312,27 +306,23 @@ public class ObjectProcessor implements Consumer<URI>, AutoCloseable {
      * @return the blob id.
      * @throws IllegalArgumentException if the token is not a well-formed pid or datastream token.
      */
-    public static URI getBlobId(final String token) {
+    static URI getBlobId(final String token) {
         try {
             final int i = token.indexOf('+');
-            if (i == -1) {
+            if (i == -1)
                 // This is an object reference, just return it with the proper prefix.
                 return new URI((token.startsWith(FEDORA_URI) ? "" : FEDORA_URI) + token);
-            } else {
+            else {
                 // Split up into [ id, dsId, ds Version Id ]
                 final String[] dsParts = token.split("\\+");
-                if (dsParts.length != 3) {
-                    throw new IllegalArgumentException(
-                            "Malformed datastream token: " + token);
-                }
+                if (dsParts.length != 3)
+                    throw new IllegalArgumentException("Malformed datastream token: " + token);
                 final String encodedToken = dsParts[0] + "/" + uriEncode(dsParts[1]) + "/" + uriEncode(
                         dsParts[2]);
-
                 return new URI((token.startsWith(FEDORA_URI) ? "" : FEDORA_URI) + encodedToken);
             }
         } catch (final URISyntaxException e) {
-            throw new IllegalArgumentException(
-                    "Malformed object or datastream token: " + token, e);
+            throw new IllegalArgumentException("Malformed object or datastream token: " + token, e);
         }
     }
 
